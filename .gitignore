@@ -1,0 +1,19 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# IDE
+.idea/
+
+# Experiment artifacts
+dataset/
+experiment/
+trunc/
+table_examples/
+wandb/
