@@ -103,7 +103,7 @@ Per-country overrides are available via `REWARD_THRES_OVERRIDE`, `LR_OVERRIDE`, 
 ## Citation
 
 ```
-@misc{sscpo,
+@misc{scpo,
       title={Steerable Cultural Preference Optimization of Reward Models}, 
       author={Minsik Oh and Advit Deepak and Sophie Wu and Douwe Kiela and Ekaterina Shutova},
       year={2026},
