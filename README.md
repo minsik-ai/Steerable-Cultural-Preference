@@ -1,6 +1,6 @@
 # Steerable Cultural Preference Optimization of Reward Models (SCPO)
 
-Paper: Steerable Cultural Preference Optimization of Reward Models
+Paper: [Steerable Cultural Preference Optimization of Reward Models](https://arxiv.org/abs/2606.18606)
 
 Accepted to **Pluralistic Alignment @ ICML 2026**.
 
@@ -100,3 +100,16 @@ model checkpoints (`<out_path>/trunc/<country>/...`), and the JSON reports above
 Per-country overrides are available via `REWARD_THRES_OVERRIDE`, `LR_OVERRIDE`, and
 `EDITED_LR_OVERRIDE`.
 
+## Citation
+
+```
+@misc{sscpo,
+      title={Steerable Cultural Preference Optimization of Reward Models}, 
+      author={Minsik Oh and Advit Deepak and Sophie Wu and Douwe Kiela and Ekaterina Shutova},
+      year={2026},
+      eprint={2606.18606},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2606.18606}, 
+}
+```
