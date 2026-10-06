@@ -113,3 +113,47 @@ Per-country overrides are available via `REWARD_THRES_OVERRIDE`, `LR_OVERRIDE`, 
       url={https://arxiv.org/abs/2606.18606}, 
 }
 ```
+
+## PW replication
+
+Use **Python 3.11** for the pinned replication environment. `requirements.txt`
+contains project dependencies rather than Ubuntu system packages:
+
+```bash
+uv venv --python 3.11 .venv
+uv pip install --python .venv/bin/python -r requirements.txt
+uv pip check --python .venv/bin/python
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/validate_data.py --output artifacts/data-validation.json
+```
+
+The PW checkout is `/home/minsik/Steerable-Cultural-Preference`, beside InferLLM.
+Submit from that directory after creating `artifacts/logs`:
+
+```bash
+mkdir -p artifacts/logs
+sbatch --output=artifacts/logs/smoke_%j.out scripts/reproduce_pw.sbatch \
+  "$PWD" "$PWD/artifacts/smoke-01" \
+  --countries Chile --max-interactions 32 --max-steps 2
+
+# Full supplied configuration: seven countries, 1024 optimizer steps each.
+sbatch --output=artifacts/logs/full_%j.out scripts/reproduce_pw.sbatch \
+  "$PWD" "$PWD/artifacts/full-01"
+```
+
+Each output path must be new. A smoke run checks the pipeline, **not paper
+accuracy**. The original 1024-step setting overrides `EDITED_EPOCHS=3`; the legacy
+checkpoint directory name `ours_3epoch` is retained. Model/dataset revisions are
+resolved once and stored in `run_manifest.json`; pass `--model-revision` and
+`--dataset-revision` to replay those SHAs. Counts and completed countries are
+recorded there, and reports are saved after each country. The Slurm runner saves
+source revision/diff, installed package versions, and local checkpoint reload
+validation. Outputs and downloaded data are not committed.
+
+Scoring now uses evaluation mode without gradients, capped at 512 tokens;
+Trainer uses the declared seed 0. These corrections affect historical numerical
+comparability. Train filtering remains probability < 0.7; the edited test subset
+contains strictly misranked reference pairs (< 0.5), so its baseline is zero by
+construction. Full accuracy uses a country macro-average; edited ratios pool
+pairs. See [the replication log](docs/replication-log.md) for actual execution
+results and missing Tulu/ablation configurations.

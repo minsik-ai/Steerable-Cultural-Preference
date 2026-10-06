@@ -17,3 +17,6 @@ experiment/
 trunc/
 table_examples/
 wandb/
+
+# Cluster replication outputs and resolved environment
+artifacts/

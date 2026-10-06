@@ -1,6 +1,9 @@
 # from transformers.utils import logging
 # logging.set_verbosity_error()
 import csv
+import json
+from pathlib import Path
+from huggingface_hub import HfApi
 import warnings
 
 from peft import LoraConfig, TaskType
@@ -63,7 +66,33 @@ MODEL_NAME = "OpenAssistant/reward-model-deberta-v3-base"
 # MODEL_NAME = "allenai/Llama-3.1-Tulu-3-8B-RM"
 
 
-def main(out_path):
+def main(out_path, *, selected_countries=None, max_steps=None, max_interactions=None,
+         model_revision=None, dataset_revision=None):
+    output = Path(out_path)
+    if output.exists() and any(output.iterdir()):
+        raise ValueError(f"Output directory must be empty: {output}")
+    output.mkdir(parents=True, exist_ok=True)
+    # Resolve floating Hub refs once so all countries use the same artifacts.
+    api = HfApi()
+    model_revision = api.model_info(MODEL_NAME, revision=model_revision).sha
+    dataset_revision = api.dataset_info("HannahRoseKirk/prism-alignment", revision=dataset_revision).sha
+    manifest = dict(model=MODEL_NAME, model_revision=model_revision,
+                    dataset_revision=dataset_revision, model_seed=RANDOM_MODEL_SEED,
+                    trainer_seed=RANDOM_MODEL_SEED, split_seed=RANDOM_DATA_SPLIT_SEED,
+                    shuffle_seed=RANDOM_DATA_SHUFFLE_SEED, beta=WEIGHTING_BETA,
+                    train_threshold=REWARD_THRES, test_threshold=0.5,
+                    learning_rate=EDITED_LR, epochs=EDITED_EPOCHS,
+                    max_steps=max_steps if max_steps is not None else MAX_STEPS,
+                    max_interactions=max_interactions,
+                    run_kind="smoke" if max_interactions or max_steps is not None else "full",
+                    training_max_length=512, scoring_max_length=512,
+                    status="started")
+    manifest_path = output / "run_manifest.json"
+
+    def save_manifest():
+        manifest_path.write_text(json.dumps(manifest, indent=2) + "\n")
+
+    save_manifest()
     print("script starting")
     # Use reside_country
 
@@ -105,13 +134,24 @@ def main(out_path):
 
     # countries = ["Japan"]
     countries = ["Chile", "South Africa", "New Zealand", "Australia", "Mexico", "Israel", "Canada"]
+    if selected_countries is not None:
+        unknown = set(selected_countries) - set(countries)
+        if unknown:
+            raise ValueError(f"Unknown countries: {sorted(unknown)}")
+        countries = list(dict.fromkeys(selected_countries))
+    manifest["countries"] = countries
+    save_manifest()
 
     print("dataset starting")
     from datasets import load_dataset
     # Load datasets
-    utts = load_dataset("HannahRoseKirk/prism-alignment", "utterances", split="train")
-    infos = load_dataset("HannahRoseKirk/prism-alignment", "survey", split="train")
+    utts = load_dataset("HannahRoseKirk/prism-alignment", "utterances", split="train", revision=dataset_revision)
+    infos = load_dataset("HannahRoseKirk/prism-alignment", "survey", split="train", revision=dataset_revision)
 
+    if len(set(infos["user_id"])) != len(infos):
+        raise ValueError("Survey user IDs are not unique; row splitting could leak users")
+    manifest["dataset_fingerprints"] = {"utterances": utts._fingerprint, "survey": infos._fingerprint}
+    save_manifest()
     info_split = infos.train_test_split(test_size=0.15, seed=RANDOM_DATA_SPLIT_SEED)
     info_split.save_to_disk(f"{out_path}/dataset/PRISM/seed/{RANDOM_DATA_SPLIT_SEED}/")
 
@@ -174,6 +214,15 @@ def main(out_path):
                 utt_test[country][key].append(utt)
             else:
                 continue
+    if max_interactions is not None:
+        for country in countries:
+            utt_train[country] = dict(list(utt_train[country].items())[:max_interactions])
+            utt_test[country] = dict(list(utt_test[country].items())[:max_interactions])
+    for groups in (utt_train, utt_test):
+        for country, interactions in groups.items():
+            for rows in interactions.values():
+                if len({row["user_prompt"] for row in rows}) != 1:
+                    raise ValueError(f"Different prompts in one interaction for {country}")
     print("**** Raw Utterances ****")
     print("**** Train ****")
     print({count: len(items) for count, items in utt_train.items()})
@@ -201,10 +250,11 @@ def main(out_path):
 
     # model predicts which generated answer is better judged by a human
     # returns a score of how good a response is given a question (?)
-    model, tokenizer = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME), \
-                       AutoTokenizer.from_pretrained(MODEL_NAME)
+    model, tokenizer = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, revision=model_revision), \
+                       AutoTokenizer.from_pretrained(MODEL_NAME, revision=model_revision)
 
     model = model.to(device)
+    model.eval()
 
     ### BASELINE ###
 
@@ -232,11 +282,12 @@ def main(out_path):
                     a_s.append(a)
 
                 # tokenize the inputs
-                inputs = tokenizer(q_s, a_s, padding=True, return_tensors='pt').to(device)
+                inputs = tokenizer(q_s, a_s, padding=True, truncation=True, max_length=512, return_tensors='pt').to(device)
                 # given question, answer
                 # get a score for how good the answer is
                 # save the score for the given utterance
-                scores = model(**inputs).logits.cpu().detach()
+                with torch.inference_mode():
+                    scores = model(**inputs).logits.cpu()
                 for j in range(len(utt_batch)):
                     utt_id = utt_batch[j]["utterance_id"]
                     score = scores[j]
@@ -258,9 +309,10 @@ def main(out_path):
                     a = utt["model_response"]
                     q_s.append(q)
                     a_s.append(a)
-                inputs = tokenizer(q_s, a_s, padding=True, return_tensors='pt').to(device)
+                inputs = tokenizer(q_s, a_s, padding=True, truncation=True, max_length=512, return_tensors='pt').to(device)
 
-                scores = model(**inputs).logits.cpu().detach()
+                with torch.inference_mode():
+                    scores = model(**inputs).logits.cpu()
                 for j in range(len(utt_batch)):
                     utt = utt_batch[j]
                     utt_id = utt["utterance_id"]
@@ -285,7 +337,7 @@ def main(out_path):
     # what is interaction_id?
 
     def score_thres(bigger, smaller, country):
-        return (torch.exp(bigger) / (torch.exp(bigger) + torch.exp(smaller))) < (REWARD_THRES if country not in REWARD_THRES_OVERRIDE else REWARD_THRES_OVERRIDE[country])
+        return torch.sigmoid(bigger - smaller) < (REWARD_THRES if country not in REWARD_THRES_OVERRIDE else REWARD_THRES_OVERRIDE[country])
 
     # utt_pref_train = {country: [(pref_utt_id, dispref_utt_id)...]}
     for country, keyed_per_turn in utt_train.items():
@@ -395,6 +447,28 @@ def main(out_path):
         print(f"{count}: {edited_ratios['test'][count]:.4f}")
     print(f"Average: {edited_ratios['test']['avg']:.4f}")
 
+    counts = {
+        count: {"train_pairs": len(utt_pref_train[count]),
+                "train_edited_pairs": len(utt_pref_edited_train[count]),
+                "test_pairs": len(utt_pref_test[count]),
+                "test_edited_pairs": len(utt_pref_edited_test[count])}
+        for count in countries
+    }
+    manifest["pair_counts"] = counts
+    save_manifest()
+    for count, values in counts.items():
+        if not all(values.values()):
+            raise ValueError(f"Empty pair subset for {count}: {values}; increase smoke interactions")
+
+    report_dir = output / "experiment" / "seed" / str(RANDOM_MODEL_SEED)
+    report_dir.mkdir(parents=True, exist_ok=True)
+
+    def save_reports():
+        for filename, data in (("full_report.json", full_perfs),
+                               ("partial_report.json", partial_perfs),
+                               ("edited_ratios.json", edited_ratios)):
+            (report_dir / filename).write_text(json.dumps(data, indent=2) + "\n")
+
     print("**** Starting reward model Evals ****")
     print("**** Percentage of pairs correctly evaluated ****")
     avg_perf = 0.
@@ -441,6 +515,11 @@ def main(out_path):
     partial_perfs["avg"]["start"] = avg_perf
     print(f"Starting Partial Performance: {avg_perf:.2f}%")
 
+    save_reports()
+    del model
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
     print("**** Training Country-Specific Models ****")
 
     ### TRAIN THE REWARD MODEL (DEBERTA) WITH EDITED PREFS ###
@@ -452,8 +531,8 @@ def main(out_path):
     test_baseline_rewards = collections.defaultdict(dict)
     # Train reward model
     for count in countries:
-        model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
-        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+        model = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME, revision=model_revision)
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME, revision=model_revision)
 
         def format_func_train(examples):
             kwargs = {"padding": "max_length", "truncation": True, "max_length": 512, "return_tensors": "pt"}
@@ -498,7 +577,9 @@ def main(out_path):
             output_dir=f"{out_path}/trunc/{count}/ours_{EDITED_EPOCHS}epoch/",
             per_device_train_batch_size=BATCH_SIZE,
             num_train_epochs=EDITED_EPOCHS,
-            max_steps=MAX_STEPS[count],
+            max_steps=MAX_STEPS[count] if max_steps is None else max_steps,
+            seed=RANDOM_MODEL_SEED,
+            data_seed=RANDOM_DATA_SHUFFLE_SEED,
             learning_rate=EDITED_LR,
             logging_steps=25,
             eval_strategy="steps",
@@ -523,6 +604,8 @@ def main(out_path):
         trainer.train()
 
         trainer.save_model(training_args.output_dir)
+        tokenizer.save_pretrained(training_args.output_dir)
+        model.eval()
 
         rewards = test_baseline_rewards[count]
         print("Scoring the test set!")
@@ -537,8 +620,9 @@ def main(out_path):
                     a = utt["model_response"]
                     q_s.append(q)
                     a_s.append(a)
-                inputs = tokenizer(q_s, a_s, padding=True, return_tensors='pt').to(device)
-                scores = model(**inputs).logits.cpu().detach()
+                inputs = tokenizer(q_s, a_s, padding=True, truncation=True, max_length=512, return_tensors='pt').to(device)
+                with torch.inference_mode():
+                    scores = model(**inputs).logits.cpu()
                 for j in range(len(utt_batch)):
                     utt_id = utt_batch[j]["utterance_id"]
                     score = scores[j]
@@ -582,6 +666,12 @@ def main(out_path):
         print(f"{count}: {perf:.2f}%")
         partial_perfs[count]["ours_partial"] = perf
         avg_partial_perf += perf
+        manifest.setdefault("completed_countries", []).append(count)
+        save_reports()
+        save_manifest()
+        del trainer, model
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     print("**** Ablation reward model Evals ****")
     print("**** Percentage of pairs correctly evaluated ****")
@@ -593,7 +683,6 @@ def main(out_path):
     partial_perfs["avg"]["ours_partial"] = avg_partial_perf
     print(f"Ablation Model Partial Performance: {avg_partial_perf:.2f}%")
 
-    import json
     path = f"{out_path}/experiment/seed/{RANDOM_MODEL_SEED}/"
     if not os.path.exists(path):
         os.makedirs(path)
@@ -614,13 +703,28 @@ def main(out_path):
         json.dump(edited_ratios, f, ensure_ascii=False, indent=4)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("out_path")
-args = parser.parse_args()
+    manifest["status"] = "complete"
+    save_manifest()
 
-os.environ["TOKENIZERS_PARALLELISM"] = "true"
-# Press the green button in the gutter to run the script.
+
+def positive_int(value):
+    number = int(value)
+    if number <= 0:
+        raise argparse.ArgumentTypeError("must be a positive integer")
+    return number
+
+
 if __name__ == '__main__':
-    main(args.out_path)
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    parser = argparse.ArgumentParser(description="Replicate the supplied DeBERTa SCPO experiment")
+    parser.add_argument("out_path", help="new or empty artifact directory")
+    parser.add_argument("--countries", nargs="+", choices=list(MAX_STEPS))
+    parser.add_argument("--max-steps", type=positive_int, help="override 1024 steps/country for a smoke run")
+    parser.add_argument("--max-interactions", type=positive_int,
+                        help="first N interactions per country/split; smoke only")
+    parser.add_argument("--model-revision", help="Hub revision, resolved to a SHA at startup")
+    parser.add_argument("--dataset-revision", help="Hub revision, resolved to a SHA at startup")
+    args = parser.parse_args()
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+    main(args.out_path, selected_countries=args.countries, max_steps=args.max_steps,
+         max_interactions=args.max_interactions, model_revision=args.model_revision,
+         dataset_revision=args.dataset_revision)

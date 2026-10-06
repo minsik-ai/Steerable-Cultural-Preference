@@ -1,0 +1,73 @@
+"""Exercise the real trainer/report/export path offline with synthetic data.
+
+This is a software integration test, not a PRISM/model reproduction.
+"""
+import json
+import tempfile
+import unittest
+from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
+
+import torch
+from datasets import Dataset
+from transformers import BertConfig, BertForSequenceClassification, BertTokenizer
+
+import preferences
+
+
+class MainSmokeTests(unittest.TestCase):
+    def test_training_reporting_and_export(self):
+        torch.set_num_threads(2)
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            base = root / 'tiny-fixture'
+            base.mkdir()
+            (base / 'vocab.txt').write_text('[PAD]\n[UNK]\n[CLS]\n[SEP]\n[MASK]\nquestion\ngood\nbad\n')
+            tokenizer = BertTokenizer(str(base / 'vocab.txt'))
+            tokenizer.save_pretrained(base)
+            model = BertForSequenceClassification(BertConfig(
+                vocab_size=8, hidden_size=16, num_hidden_layers=1,
+                num_attention_heads=2, intermediate_size=32, num_labels=1,
+                max_position_embeddings=512))
+            model.eval()
+            inputs = tokenizer(['question', 'question'], ['good', 'bad'], return_tensors='pt')
+            with torch.inference_mode():
+                scores = model(**inputs).logits.flatten()
+            self.assertNotEqual(scores[0].item(), scores[1].item())
+            # Oppose the reference model so edited train/test subsets are nonempty.
+            preferred = int(scores.argmin())
+            model.save_pretrained(base)
+            surveys, utterances = [], []
+            for user in range(20):
+                surveys.append(dict(user_id=str(user), location=dict(
+                    reside_country='Chile', birth_country='Chile')))
+                for answer_index, answer in enumerate(('good', 'bad')):
+                    utterances.append(dict(user_id=str(user), interaction_id=str(user),
+                                           utterance_id=f'{user}-{answer_index}',
+                                           user_prompt='question', model_response=answer,
+                                           score=1 if answer_index == preferred else 0))
+            data = {'survey': Dataset.from_list(surveys), 'utterances': Dataset.from_list(utterances)}
+            api = SimpleNamespace(model_info=lambda *a, **k: SimpleNamespace(sha='local-fixture'),
+                                  dataset_info=lambda *a, **k: SimpleNamespace(sha='synthetic-fixture'))
+            output = root / 'run'
+            with patch.object(preferences, 'MODEL_NAME', str(base)), \
+                 patch.object(preferences, 'HfApi', return_value=api), \
+                 patch('datasets.load_dataset', side_effect=lambda name, config, **kw: data[config]):
+                preferences.main(str(output), selected_countries=['Chile'], max_steps=1)
+            manifest = json.loads((output / 'run_manifest.json').read_text())
+            self.assertEqual(manifest['status'], 'complete')
+            self.assertEqual(manifest['completed_countries'], ['Chile'])
+            self.assertEqual(manifest['pair_counts']['Chile']['test_pairs'], 3)
+            partial = json.loads((output / 'experiment/seed/0/partial_report.json').read_text())
+            self.assertEqual(partial['Chile']['start'], 0)
+            self.assertIn('ours_partial', partial['Chile'])
+            checkpoint = output / 'trunc/Chile/ours_3epoch'
+            reloaded = BertForSequenceClassification.from_pretrained(checkpoint).eval()
+            BertTokenizer.from_pretrained(checkpoint)
+            with torch.inference_mode():
+                self.assertTrue(torch.isfinite(reloaded(**inputs).logits).all())
+
+
+if __name__ == '__main__':
+    unittest.main()
