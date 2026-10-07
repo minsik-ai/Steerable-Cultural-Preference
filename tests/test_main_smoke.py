@@ -6,14 +6,13 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from types import SimpleNamespace
+import runpy
+import sys
 from unittest.mock import patch
 
 import torch
 from datasets import Dataset
 from transformers import BertConfig, BertForSequenceClassification, BertTokenizer
-
-import preferences
 
 
 class MainSmokeTests(unittest.TestCase):
@@ -39,32 +38,36 @@ class MainSmokeTests(unittest.TestCase):
             preferred = int(scores.argmin())
             model.save_pretrained(base)
             surveys, utterances = [], []
-            for user in range(20):
-                surveys.append(dict(user_id=str(user), location=dict(
-                    reside_country='Chile', birth_country='Chile')))
-                for answer_index, answer in enumerate(('good', 'bad')):
-                    utterances.append(dict(user_id=str(user), interaction_id=str(user),
-                                           utterance_id=f'{user}-{answer_index}',
-                                           user_prompt='question', model_response=answer,
-                                           score=1 if answer_index == preferred else 0))
+            countries = ['Chile', 'South Africa', 'New Zealand', 'Australia', 'Mexico', 'Israel', 'Canada']
+            for country in countries:
+                for user_index in range(20):
+                    user = f'{country}-{user_index}'
+                    surveys.append(dict(user_id=user, location=dict(
+                        reside_country=country, birth_country=country)))
+                    for answer_index, answer in enumerate(('good', 'bad')):
+                        utterances.append(dict(user_id=user, interaction_id=user,
+                                               utterance_id=f'{user}-{answer_index}',
+                                               user_prompt='question', model_response=answer,
+                                               score=1 if answer_index == preferred else 0))
             data = {'survey': Dataset.from_list(surveys), 'utterances': Dataset.from_list(utterances)}
-            api = SimpleNamespace(model_info=lambda *a, **k: SimpleNamespace(sha='local-fixture'),
-                                  dataset_info=lambda *a, **k: SimpleNamespace(sha='synthetic-fixture'))
             output = root / 'run'
-            with patch.object(preferences, 'MODEL_NAME', str(base)), \
-                 patch.object(preferences, 'HfApi', return_value=api), \
-                 patch('datasets.load_dataset', side_effect=lambda name, config, **kw: data[config]):
-                preferences.main(str(output), selected_countries=['Chile'], max_steps=1)
-            manifest = json.loads((output / 'run_manifest.json').read_text())
-            self.assertEqual(manifest['status'], 'complete')
-            self.assertEqual(manifest['completed_countries'], ['Chile'])
-            self.assertEqual(manifest['pair_counts']['Chile']['test_pairs'], 3)
+            # Load the original CLI unchanged. Only this synthetic test substitutes
+            # its local fixture model/data and one-step training budget.
+            with patch.object(sys, 'argv', ['preferences.py', str(output)]):
+                namespace = runpy.run_path(str(Path(__file__).resolve().parents[1] / 'preferences.py'))
+            main = namespace['main']
+            main.__globals__['MODEL_NAME'] = str(base)
+            main.__globals__['MAX_STEPS'] = {country: 1 for country in countries}
+            with patch('datasets.load_dataset', side_effect=lambda name, config, **kw: data[config]):
+                main(str(output))
+            report = json.loads((output / 'experiment/seed/0/full_report.json').read_text())
+            self.assertEqual(set(report), set(countries) | {'avg'})
+            self.assertTrue(all('ours_partial' in report[country] for country in countries))
             partial = json.loads((output / 'experiment/seed/0/partial_report.json').read_text())
             self.assertEqual(partial['Chile']['start'], 0)
             self.assertIn('ours_partial', partial['Chile'])
             checkpoint = output / 'trunc/Chile/ours_3epoch'
             reloaded = BertForSequenceClassification.from_pretrained(checkpoint).eval()
-            BertTokenizer.from_pretrained(checkpoint)
             with torch.inference_mode():
                 self.assertTrue(torch.isfinite(reloaded(**inputs).logits).all())
 

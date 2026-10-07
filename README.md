@@ -116,8 +116,7 @@ Per-country overrides are available via `REWARD_THRES_OVERRIDE`, `LR_OVERRIDE`, 
 
 ## PW replication
 
-Use **Python 3.11** for the pinned replication environment. `requirements.txt`
-contains project dependencies rather than Ubuntu system packages:
+Use **Python 3.11** for the pinned dependency environment:
 
 ```bash
 uv venv --python 3.11 .venv
@@ -127,33 +126,31 @@ uv pip check --python .venv/bin/python
 .venv/bin/python scripts/validate_data.py --output artifacts/data-validation.json
 ```
 
+`preferences.py`, both trainers, and the collator are byte-for-byte identical to
+original revision `94f8430054835aa919b226b4344b8f0e8424f29b`. The fidelity test
+checks this explicitly. The integration test uses synthetic data and a tiny
+local model; it does not constitute paper reproduction.
+
 The PW checkout is `/home/minsik/Steerable-Cultural-Preference`, beside InferLLM.
-Submit from that directory after creating `artifacts/logs`:
+Run the original seven-country experiment with a new output directory:
 
 ```bash
 mkdir -p artifacts/logs
-sbatch --output=artifacts/logs/smoke_%j.out scripts/reproduce_pw.sbatch \
-  "$PWD" "$PWD/artifacts/smoke-01" \
-  --countries Chile --max-interactions 32 --max-steps 2
-
-# Full supplied configuration: seven countries, 1024 optimizer steps each.
-sbatch --output=artifacts/logs/full_%j.out scripts/reproduce_pw.sbatch \
-  "$PWD" "$PWD/artifacts/full-01"
+sbatch --output=artifacts/logs/original_%j.out scripts/reproduce_pw.sbatch \
+  "$PWD" "$PWD/artifacts/original-01"
 ```
 
-Each output path must be new. A smoke run checks the pipeline, **not paper
-accuracy**. The original 1024-step setting overrides `EDITED_EPOCHS=3`; the legacy
-checkpoint directory name `ours_3epoch` is retained. Model/dataset revisions are
-resolved once and stored in `run_manifest.json`; pass `--model-revision` and
-`--dataset-revision` to replay those SHAs. Counts and completed countries are
-recorded there, and reports are saved after each country. The Slurm runner saves
-source revision/diff, installed package versions, and local checkpoint reload
-validation. Outputs and downloaded data are not committed.
+The runner rejects additional experiment overrides. It invokes the original
+`python preferences.py <out_path>` entry point with its original seeds, scoring,
+filtering, model mode, and 1024 optimizer steps per country. It records source
+revision/diff and installed package versions outside the experiment code.
+Checkpoint reload validation runs afterward in a separate process, using the
+base tokenizer because the original script does not export tokenizer files.
+That validator's evaluation mode does not affect training or reported accuracy.
 
-Scoring now uses evaluation mode without gradients, capped at 512 tokens;
-Trainer uses the declared seed 0. These corrections affect historical numerical
-comparability. Train filtering remains probability < 0.7; the edited test subset
-contains strictly misranked reference pairs (< 0.5), so its baseline is zero by
-construction. Full accuracy uses a country macro-average; edited ratios pool
-pairs. See [the replication log](docs/replication-log.md) for actual execution
-results and missing Tulu/ablation configurations.
+Previous `artifacts/full-01` results came from the modified execution at commit
+`676d16f` and must not be described as an original-code reproduction. The
+original source uses floating Hub references and the repaired dependency file
+is not an exact historical environment lock. Matching the original code is a
+necessary checkpoint, not proof of matching the paper's three-run results.
+See [the replication log](docs/replication-log.md) for evidence and remaining gaps.

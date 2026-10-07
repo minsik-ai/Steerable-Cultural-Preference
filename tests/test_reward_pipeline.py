@@ -50,23 +50,5 @@ class RewardPipelineTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(parameter.grad))
 
 
-class RunnerValidationTests(unittest.TestCase):
-    def test_existing_results_are_not_overwritten(self):
-        from preferences import main
-        with tempfile.TemporaryDirectory() as folder:
-            marker = Path(folder) / 'existing-result.json'
-            marker.write_text('{"preserve": true}')
-            with self.assertRaisesRegex(ValueError, 'must be empty'):
-                main(folder)
-            self.assertEqual(marker.read_text(), '{"preserve": true}')
-
-    def test_smoke_budget_rejects_nonpositive_values(self):
-        import argparse
-        from preferences import positive_int
-        for value in ('0', '-1'):
-            with self.assertRaises(argparse.ArgumentTypeError):
-                positive_int(value)
-
-
 if __name__ == '__main__':
     unittest.main()

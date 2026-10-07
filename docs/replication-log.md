@@ -1,6 +1,6 @@
 # PW replication log
 
-## Scope and change plan
+## Initial setup and change plan (historical; execution changes reverted below)
 
 Starting revision: `94f8430054835aa919b226b4344b8f0e8424f29b`.
 Cluster checkout: `/home/minsik/Steerable-Cultural-Preference`, beside InferLLM.
@@ -118,3 +118,44 @@ Full job **53241** is queued with `afterok:53240` and
 12 hours, runs all seven countries at 1024 optimizer steps each, and pins the
 above model/dataset SHAs. Outputs: `artifacts/smoke-01` and `artifacts/full-01`.
 At handoff: smoke is pending for priority/resources; full is pending dependency.
+
+
+## Original-execution restoration (2026-10-07)
+
+User requires paper replication and requested removal of all execution changes.
+Restored `preferences.py` exactly from `94f8430054835aa919b226b4344b8f0e8424f29b`.
+Both reward trainers and the collator also match that revision byte-for-byte.
+This restores implicit Trainer seed/data-seed behavior, unbounded paired scoring,
+post-training model mode, gradient-enabled forward passes, original exponent
+threshold, floating Hub references, and the original CLI and artifact behavior.
+The synthetic smoke test now exercises the original function with test-only
+model/data/budget substitution. Production execution has no such substitutions.
+
+Kept the installable dependencies and external validation/Slurm tooling. The
+runner checks source fidelity, rejects experiment overrides, and uses a fresh
+output path. Reload validation is a separate post-run process with the base
+tokenizer; it cannot alter the experiment's reward scores or JSON reports.
+
+Prior modified-execution jobs 53240 and 53241 both completed successfully. The
+full run's overall macro accuracy was 61.9299% versus global RM 58.5473%; its
+reference-misranked subset macro accuracy was 19.6093%. All seven checkpoint
+reload validations passed. These artifacts remain under `artifacts/full-01`
+for comparison and are explicitly **not** original-execution reproduction.
+
+Paper comparisons: tuned SCPO overall 63.42%, reference-misranked subset 28.69%
+(Tables 1–2), three runs per setting (Appendix A). The supplied code globally
+splits survey rows, whereas the paper says country-stratified; this restoration
+does not invent a replacement split. Original seeds, environment, and selected
+settings still need reconciliation before numerical reproduction can be claimed.
+Source: https://arxiv.org/html/2606.18606v1
+
+Restoration validation: four tests pass on PW, including byte-identical source
+verification and the original seven-country training/reporting path on synthetic
+fixtures (one step per country). Dependency compatibility, Python compilation,
+critical Ruff checks, shell syntax, and whitespace checks pass. Log:
+`artifacts/logs/original-source-tests.log`.
+
+The original-code rerun uses `artifacts/original-01`, leaving previous outputs
+intact. Submission/status are recorded in `artifacts/original-submission.txt` and
+Slurm `artifacts/logs/original_<jobid>.out`. No experiment-configuration override
+is passed. Numerical comparison must wait for that run to complete.

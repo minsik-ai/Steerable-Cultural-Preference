@@ -11,9 +11,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('checkpoint')
     parser.add_argument('--output', required=True)
+    parser.add_argument('--tokenizer', help='Base tokenizer for original checkpoints without tokenizer files')
     args = parser.parse_args()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    tokenizer = AutoTokenizer.from_pretrained(args.checkpoint, local_files_only=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.tokenizer or args.checkpoint, local_files_only=True)
     model = AutoModelForSequenceClassification.from_pretrained(args.checkpoint, local_files_only=True).to(device).eval()
     questions = ['What is a respectful way to disagree?', 'Explain the water cycle.']
     answers = ['Listen first and explain your reasons calmly.', 'Water evaporates, condenses, and falls as precipitation.']
