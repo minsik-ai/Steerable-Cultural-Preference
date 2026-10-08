@@ -159,3 +159,13 @@ The original-code rerun uses `artifacts/original-01`, leaving previous outputs
 intact. Submission/status are recorded in `artifacts/original-submission.txt` and
 Slurm `artifacts/logs/original_<jobid>.out`. No experiment-configuration override
 is passed. Numerical comparison must wait for that run to complete.
+
+## Selective country search
+
+After original run 53802, the user authorized the staged ablations with early
+stopping and requested no extra work on countries already close to the paper.
+See `docs/country-search.md` for exact predeclared thresholds, ordered settings,
+source-fidelity constraints, and the eight passing validation tests. Canada and
+South Africa retain their original-01 checkpoints. Only the remaining five
+countries are searched, using an immutable source snapshot and external trial
+copies. Selected scores are exploratory fixed-test matches.

@@ -71,6 +71,27 @@ class MainSmokeTests(unittest.TestCase):
             with torch.inference_mode():
                 self.assertTrue(torch.isfinite(reloaded(**inputs).logits).all())
 
+            # Country isolation must preserve the original first-country result.
+            from scripts.country_search import BASE, trial_source
+            original = (Path(__file__).resolve().parents[1] / 'preferences.py').read_text()
+            isolated_script = root / 'isolated.py'
+            isolated_script.write_text(trial_source(original, 'Chile', BASE))
+            isolated_output = root / 'isolated-run'
+            with patch.object(sys, 'argv', ['preferences.py', str(isolated_output)]):
+                isolated_main = runpy.run_path(str(isolated_script))['main']
+            isolated_main.__globals__['MODEL_NAME'] = str(base)
+            isolated_main.__globals__['MAX_STEPS'] = {'Chile': 1}
+            with patch('datasets.load_dataset', side_effect=lambda name, config, **kw: data[config]):
+                isolated_main(str(isolated_output))
+            for name in ('full_report.json', 'partial_report.json'):
+                original_report = json.loads((output / 'experiment/seed/0' / name).read_text())
+                isolated_report = json.loads((isolated_output / 'experiment/seed/0' / name).read_text())
+                self.assertEqual(original_report['Chile'], isolated_report['Chile'])
+            isolated_model = BertForSequenceClassification.from_pretrained(
+                isolated_output / 'trunc/Chile/ours_3epoch')
+            for key, tensor in reloaded.state_dict().items():
+                torch.testing.assert_close(tensor, isolated_model.state_dict()[key], rtol=0, atol=0)
+
 
 if __name__ == '__main__':
     unittest.main()

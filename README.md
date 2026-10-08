@@ -154,3 +154,12 @@ original source uses floating Hub references and the repaired dependency file
 is not an exact historical environment lock. Matching the original code is a
 necessary checkpoint, not proof of matching the paper's three-run results.
 See [the replication log](docs/replication-log.md) for evidence and remaining gaps.
+
+### Country-specific search
+
+The optional [bounded search](docs/country-search.md) keeps the original source
+intact and stops independently when each remaining country meets its declared
+paper-score threshold. `scripts/country_search_pw.sbatch` runs five country
+workers, at most three at once; Canada and South Africa retain their existing
+models. Trial configurations, both evaluation metrics, source diffs, and every
+attempt are preserved. These are exploratory configuration matches.
