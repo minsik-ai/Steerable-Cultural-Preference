@@ -90,30 +90,32 @@ def write_json(path, value):
     temporary.replace(path)
 
 
-def search(repo, root, baseline, country):
+def search(repo, root, baseline, country, *, candidates=None, require_match=True):
     verify_sources(repo)
     country_dir = root / country.lower().replace(' ', '-')
     country_dir.mkdir(parents=True, exist_ok=False)
     state_path = country_dir / 'status.json'
     state = dict(country=country, status='running', trials=[], paper_mean=TARGETS[country][0],
                  threshold=TARGETS[country][0] - TARGETS[country][1],
-                 selection='first validated overall >= paper mean minus reported spread',
+                 selection=('first validated overall >= paper mean minus reported spread'
+                            if require_match else 'run recorded country default once'),
                  interpretation='exploratory fixed-test configuration match; not independent replication',
-                 baseline=read_metrics(baseline, country),
+                 baseline=read_metrics(baseline, country) if baseline is not None else None,
                  slurm_job_id=os.environ.get('SLURM_JOB_ID'))
     write_json(state_path, state)
     try:
-        baseline_checkpoint = baseline / 'trunc' / country / 'ours_3epoch'
-        validation = json.loads((baseline_checkpoint / 'validation.json').read_text())
-        if qualifies(country, state['baseline'], validation.get('deterministic') is True):
-            state.update(status='matched_existing', selected_checkpoint=str(baseline_checkpoint))
-            write_json(state_path, state)
-            return
+        if baseline is not None and require_match:
+            baseline_checkpoint = baseline / 'trunc' / country / 'ours_3epoch'
+            validation = json.loads((baseline_checkpoint / 'validation.json').read_text())
+            if qualifies(country, state['baseline'], validation.get('deterministic') is True):
+                state.update(status='matched_existing', selected_checkpoint=str(baseline_checkpoint))
+                write_json(state_path, state)
+                return
         original = (repo / 'preferences.py').read_text()
         environment = os.environ.copy()
         environment['PYTHONPATH'] = str(repo) + os.pathsep + environment.get('PYTHONPATH', '')
         environment['TOKENIZERS_PARALLELISM'] = 'true'
-        for config in CANDIDATES:
+        for config in CANDIDATES if candidates is None else candidates:
             verify_sources(repo)
             trial = country_dir / config['name']
             trial.mkdir()
@@ -148,8 +150,10 @@ def search(repo, root, baseline, country):
             entry['validated'] = check.returncode == 0
             entry['status'] = 'completed' if entry['validated'] else 'failed_validation'
             write_json(state_path, state)
-            if qualifies(country, entry['metrics'], entry['validated']):
-                state.update(status='matched', selected_config=config, selected_metrics=entry['metrics'],
+            if not require_match and not entry['validated']:
+                raise RuntimeError(f'Checkpoint validation failed: {trial}/validation.log')
+            if entry['validated'] and (not require_match or qualifies(country, entry['metrics'], True)):
+                state.update(status='matched' if require_match else 'completed', selected_config=config, selected_metrics=entry['metrics'],
                              selected_checkpoint=str(checkpoint))
                 write_json(state_path, state)
                 return
@@ -167,9 +171,20 @@ if __name__ == '__main__':
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--country', choices=list(TARGETS))
-    parser.add_argument('--index', type=int, choices=range(len(COUNTRIES)))
+    parser.add_argument('--index', type=int)
+    parser.add_argument('--plan', type=Path, help='explicit bounded continuation plan')
     args = parser.parse_args()
     if (args.country is None) == (args.index is None):
         parser.error('provide exactly one of --country or --index')
-    search(args.repo.resolve(), args.root.resolve(), args.baseline.resolve(),
-           args.country or COUNTRIES[args.index])
+    plan = json.loads(args.plan.read_text()) if args.plan else None
+    countries = plan['countries'] if plan else COUNTRIES
+    if args.index is not None and not 0 <= args.index < len(countries):
+        parser.error('country index is outside the plan')
+    country = args.country or countries[args.index]
+    if country not in countries:
+        parser.error('country is outside the plan')
+    baseline = args.baseline.resolve()
+    if plan:
+        baseline = baseline / plan['baselines'][country]
+    search(args.repo.resolve(), args.root.resolve(), baseline, country,
+           candidates=plan['candidates'] if plan else None)

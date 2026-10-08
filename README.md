@@ -68,24 +68,30 @@ Results are written as JSON to `<out_path>/experiment/seed/<seed>/`:
 
 ## Setup
 
-Requires Python 3.8+ and a CUDA GPU (the pipeline trains DeBERTa-v3 & Tülu 3 reward models). Key
+The recorded PW defaults require Python 3.11.16, Linux, and a CUDA GPU (the pipeline trains DeBERTa-v3 & Tülu 3 reward models). Key
 pinned dependencies: `torch==2.4.1`, `transformers==4.45.2`, `trl==0.11.4`,
 `datasets==3.0.1`, plus `peft`.
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements-pw-lock.txt
 ```
 
 ## Usage
 
 ```bash
-python preferences.py <out_path>
+python scripts/run_country_defaults.py --output <out_path>
 ```
 
-`<out_path>` is the root directory for all artifacts — the saved data split, per-country
-model checkpoints (`<out_path>/trunc/<country>/...`), and the JSON reports above.
+`<out_path>` must be a new output directory. The original unmodified experiment
+remains available as `python preferences.py <out_path>` for historical comparison.
 
-### Key hyperparameters (top of `preferences.py`)
+Selected per-country defaults and their observed results are recorded in
+[configs/country_defaults.json](configs/country_defaults.json). See
+[reproduction instructions](docs/country-defaults.md) for the exact environment,
+PW launcher, and provisional Australia/Israel settings. Outputs from this default
+launcher are grouped as `<out_path>/<country>/default/run/`.
+
+### Original-script hyperparameters (top of `preferences.py`)
 
 | Name | Meaning |
 | --- | --- |
@@ -97,8 +103,8 @@ model checkpoints (`<out_path>/trunc/<country>/...`), and the JSON reports above
 | `BATCH_SIZE` | Per-device batch size. |
 | `RANDOM_DATA_SPLIT_SEED` / `RANDOM_DATA_SHUFFLE_SEED` / `RANDOM_MODEL_SEED` | Reproducibility seeds. |
 
-Per-country overrides are available via `REWARD_THRES_OVERRIDE`, `LR_OVERRIDE`, and
-`EDITED_LR_OVERRIDE`.
+Use `configs/country_defaults.json` for active per-country overrides. The original
+script and its historical override dictionaries are retained for comparison.
 
 ## Citation
 

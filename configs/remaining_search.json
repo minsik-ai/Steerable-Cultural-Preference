@@ -1,0 +1,68 @@
+{
+  "countries": [
+    "Australia",
+    "Israel"
+  ],
+  "baselines": {
+    "Australia": "artifacts/country-search-01/australia/tau-05-beta-10/run",
+    "Israel": "artifacts/country-search-01/israel/tau-05-beta-10/run"
+  },
+  "candidates": [
+    {
+      "shuffle_seed": 1,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 1.0,
+      "name": "shuffle-1"
+    },
+    {
+      "shuffle_seed": 2,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 1.0,
+      "name": "shuffle-2"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 0.9,
+      "name": "beta-09"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 0.8,
+      "name": "beta-08"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 0.67,
+      "name": "beta-067"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.4,
+      "beta": 1.0,
+      "name": "tau-04"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.6,
+      "beta": 1.0,
+      "name": "tau-06"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 5e-07,
+      "tau": 0.5,
+      "beta": 1.0,
+      "name": "lr-5e-7"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "model": "OpenAssistant/reward-model-deberta-v3-base",
+  "model_revision": "7dab4156e63944834c3aae169c3fe83955672cff",
+  "dataset": "HannahRoseKirk/prism-alignment",
+  "dataset_revision": "18ab5cfb37456f4ec8cbc00212ce54cf7b1239f6",
+  "python": "3.11.16",
+  "experiment_source_revision": "94f8430054835aa919b226b4344b8f0e8424f29b",
+  "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d",
+  "batch_size": 8,
+  "max_steps": 1024,
+  "split_seed": 0,
+  "model_seed": 0,
+  "trainer_seed": 42,
+  "trainer_data_seed": null,
+  "interpretation": "Per-country exploratory fixed-test selections; Australia and Israel remain provisional",
+  "countries": {
+    "Australia": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.5,
+      "beta": 1,
+      "status": "provisional",
+      "observed": {
+        "overall": 59.36739659367397,
+        "global_overall": 59.61070559610706,
+        "misranked": 33.13253012048193,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/australia/tau-05-beta-10/run/trunc/Australia/ours_3epoch",
+      "run": "artifacts/country-search-01/australia/tau-05-beta-10/run",
+      "paper_mean": 60.26,
+      "acceptance_threshold": 59.7
+    },
+    "Canada": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.7,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 66.1849710982659,
+        "global_overall": 60.40462427745664,
+        "misranked": 27.73722627737226,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/original-01/trunc/Canada/ours_3epoch",
+      "run": "artifacts/original-01",
+      "paper_mean": 66.09,
+      "acceptance_threshold": 65.93
+    },
+    "Chile": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.5,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 60.60606060606061,
+        "global_overall": 54.54545454545454,
+        "misranked": 37.61904761904762,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/chile/tau-05-beta-11/run/trunc/Chile/ours_3epoch",
+      "run": "artifacts/country-search-01/chile/tau-05-beta-11/run",
+      "paper_mean": 59.89,
+      "acceptance_threshold": 59.23
+    },
+    "Israel": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.5,
+      "beta": 1,
+      "status": "provisional",
+      "observed": {
+        "overall": 65.14084507042254,
+        "global_overall": 63.02816901408451,
+        "misranked": 38.095238095238095,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/israel/tau-05-beta-10/run/trunc/Israel/ours_3epoch",
+      "run": "artifacts/country-search-01/israel/tau-05-beta-10/run",
+      "paper_mean": 67.84,
+      "acceptance_threshold": 67.3
+    },
+    "Mexico": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.00001,
+      "tau": 0.7,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 64.75409836065575,
+        "global_overall": 51.63934426229508,
+        "misranked": 54.23728813559322,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/mexico/lr-1e-5/run/trunc/Mexico/ours_3epoch",
+      "run": "artifacts/country-search-01/mexico/lr-1e-5/run",
+      "paper_mean": 63.39,
+      "acceptance_threshold": 62.14
+    },
+    "New Zealand": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.5,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 62.39554317548747,
+        "global_overall": 56.54596100278552,
+        "misranked": 44.516129032258064,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/new-zealand/tau-05-beta-11/run/trunc/New Zealand/ours_3epoch",
+      "run": "artifacts/country-search-01/new-zealand/tau-05-beta-11/run",
+      "paper_mean": 62.3,
+      "acceptance_threshold": 61.66
+    },
+    "South Africa": {
+      "shuffle_seed": 0,
+      "learning_rate": 0.000001,
+      "tau": 0.7,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 65.48042704626334,
+        "global_overall": 64.05693950177937,
+        "misranked": 27.722772277227726,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/original-01/trunc/South Africa/ours_3epoch",
+      "run": "artifacts/original-01",
+      "paper_mean": 64.17,
+      "acceptance_threshold": 63.76
+    }
+  }
+}

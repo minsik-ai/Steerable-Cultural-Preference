@@ -169,3 +169,28 @@ source-fidelity constraints, and the eight passing validation tests. Canada and
 South Africa retain their original-01 checkpoints. Only the remaining five
 countries are searched, using an immutable source snapshot and external trial
 copies. Selected scores are exploratory fixed-test matches.
+
+## Recorded per-country defaults and remaining search (2026-10-08)
+
+All five workers in array 54203 completed successfully, totaling 34 validated
+trials. Chile, New Zealand and Mexico matched; Canada and South Africa retained
+their prior models. Australia and Israel exhausted the first candidate set.
+
+`configs/country_defaults.json` now records the selected per-country settings,
+checkpoint provenance and both observed metrics. Australia's 59.3674% and
+Israel's 65.1408% best settings remain provisional. The new default launcher
+reads this configuration and renders trial sources without changing original
+experiment execution. `requirements-pw-lock.txt` captures the 69-package PW
+Python 3.11.16 environment; all selected trials used the same environment.
+Runtime guards check that environment and the recorded model/data revisions.
+
+The user authorized continuing only Australia and Israel. The second bounded
+plan is `configs/remaining_search.json`: eight new candidates per country near
+tau 0.5/beta 1.0/LR 1e-6, at most two GPUs, first validated match stops the country.
+The account QoS is explicitly `yejinchoi`. The prior monitor stays paused.
+
+Validation: 12 unit/integration tests pass on PW; the runtime guard confirms the
+recorded environment and both Hub revisions. Prepare-only rendered all seven
+recorded configurations. Original source fidelity, critical static checks, Python
+compilation, and shell syntax pass. Search outputs will use
+`artifacts/country-search-02`, with a frozen source snapshot and two array workers.
