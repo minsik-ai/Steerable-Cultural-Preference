@@ -194,3 +194,16 @@ recorded environment and both Hub revisions. Prepare-only rendered all seven
 recorded configurations. Original source fidelity, critical static checks, Python
 compilation, and shell syntax pass. Search outputs will use
 `artifacts/country-search-02`, with a frozen source snapshot and two array workers.
+
+
+## Second search outcome (2026-10-09)
+
+Array 54640 completed with exit code 0 for both workers: Australia 9m17s, Israel
+34m51s. Australia matched after two trials, at shuffle=2, LR=1e-6, tau=0.5,
+beta=1.0: overall 59.8540%, misranked 35.5422%. Israel exhausted eight trials;
+its best was shuffle=0, LR=1e-6, tau=0.5, beta=0.8: overall 66.1972%, misranked
+37.1429%. Saved weights and reload validation were verified, and Israel's package
+environment matches the lock. Promoted these settings and their checkpoint/source
+provenance to country_defaults.json. Six countries meet the declared threshold;
+Israel is still provisional. The monitor remains paused and no extra jobs were
+submitted by this status check.

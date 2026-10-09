@@ -20,8 +20,11 @@ class CountryDefaultsTests(unittest.TestCase):
             self.assertIn(f'WEIGHTING_BETA = {entry["beta"]!r}', source)
             self.assertIn(f'RANDOM_DATA_SHUFFLE_SEED = {entry["shuffle_seed"]}', source)
         self.assertEqual(settings['countries']['Mexico']['learning_rate'], 1e-5)
-        for country in ('Australia', 'Israel'):
-            self.assertEqual(settings['countries'][country]['status'], 'provisional')
+        for entry in settings['countries'].values():
+            expected = 'matched' if entry['observed']['overall'] >= entry['acceptance_threshold'] else 'provisional'
+            self.assertEqual(entry['status'], expected)
+        self.assertEqual(settings['countries']['Australia']['shuffle_seed'], 2)
+        self.assertEqual(settings['countries']['Israel']['beta'], 0.8)
 
     def test_refuse_invalid_settings_and_execution_drift(self):
         original = load_settings(DEFAULT_SETTINGS)

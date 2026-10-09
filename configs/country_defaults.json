@@ -6,35 +6,35 @@
   "dataset_revision": "18ab5cfb37456f4ec8cbc00212ce54cf7b1239f6",
   "python": "3.11.16",
   "experiment_source_revision": "94f8430054835aa919b226b4344b8f0e8424f29b",
-  "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d",
   "batch_size": 8,
   "max_steps": 1024,
   "split_seed": 0,
   "model_seed": 0,
   "trainer_seed": 42,
   "trainer_data_seed": null,
-  "interpretation": "Per-country exploratory fixed-test selections; Australia and Israel remain provisional",
+  "interpretation": "Per-country exploratory fixed-test selections; Israel remains provisional",
   "countries": {
     "Australia": {
-      "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "shuffle_seed": 2,
+      "learning_rate": 1e-06,
       "tau": 0.5,
-      "beta": 1,
-      "status": "provisional",
+      "beta": 1.0,
+      "status": "matched",
       "observed": {
-        "overall": 59.36739659367397,
+        "overall": 59.854014598540154,
         "global_overall": 59.61070559610706,
-        "misranked": 33.13253012048193,
+        "misranked": 35.54216867469879,
         "global_misranked": 0
       },
-      "checkpoint": "artifacts/country-search-01/australia/tau-05-beta-10/run/trunc/Australia/ours_3epoch",
-      "run": "artifacts/country-search-01/australia/tau-05-beta-10/run",
+      "checkpoint": "artifacts/country-search-02/australia/shuffle-2/run/trunc/Australia/ours_3epoch",
+      "run": "artifacts/country-search-02/australia/shuffle-2/run",
       "paper_mean": 60.26,
-      "acceptance_threshold": 59.7
+      "acceptance_threshold": 59.7,
+      "selection_source_revision": "9b6e916cc57e69db590fb420c1bfe8b2897881a1"
     },
     "Canada": {
       "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "learning_rate": 1e-06,
       "tau": 0.7,
       "beta": 1.1,
       "status": "matched",
@@ -47,11 +47,12 @@
       "checkpoint": "artifacts/original-01/trunc/Canada/ours_3epoch",
       "run": "artifacts/original-01",
       "paper_mean": 66.09,
-      "acceptance_threshold": 65.93
+      "acceptance_threshold": 65.93,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     },
     "Chile": {
       "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "learning_rate": 1e-06,
       "tau": 0.5,
       "beta": 1.1,
       "status": "matched",
@@ -64,28 +65,30 @@
       "checkpoint": "artifacts/country-search-01/chile/tau-05-beta-11/run/trunc/Chile/ours_3epoch",
       "run": "artifacts/country-search-01/chile/tau-05-beta-11/run",
       "paper_mean": 59.89,
-      "acceptance_threshold": 59.23
+      "acceptance_threshold": 59.23,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     },
     "Israel": {
       "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "learning_rate": 1e-06,
       "tau": 0.5,
-      "beta": 1,
+      "beta": 0.8,
       "status": "provisional",
       "observed": {
-        "overall": 65.14084507042254,
+        "overall": 66.19718309859155,
         "global_overall": 63.02816901408451,
-        "misranked": 38.095238095238095,
+        "misranked": 37.142857142857146,
         "global_misranked": 0
       },
-      "checkpoint": "artifacts/country-search-01/israel/tau-05-beta-10/run/trunc/Israel/ours_3epoch",
-      "run": "artifacts/country-search-01/israel/tau-05-beta-10/run",
+      "checkpoint": "artifacts/country-search-02/israel/beta-08/run/trunc/Israel/ours_3epoch",
+      "run": "artifacts/country-search-02/israel/beta-08/run",
       "paper_mean": 67.84,
-      "acceptance_threshold": 67.3
+      "acceptance_threshold": 67.3,
+      "selection_source_revision": "9b6e916cc57e69db590fb420c1bfe8b2897881a1"
     },
     "Mexico": {
       "shuffle_seed": 0,
-      "learning_rate": 0.00001,
+      "learning_rate": 1e-05,
       "tau": 0.7,
       "beta": 1.1,
       "status": "matched",
@@ -98,11 +101,12 @@
       "checkpoint": "artifacts/country-search-01/mexico/lr-1e-5/run/trunc/Mexico/ours_3epoch",
       "run": "artifacts/country-search-01/mexico/lr-1e-5/run",
       "paper_mean": 63.39,
-      "acceptance_threshold": 62.14
+      "acceptance_threshold": 62.14,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     },
     "New Zealand": {
       "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "learning_rate": 1e-06,
       "tau": 0.5,
       "beta": 1.1,
       "status": "matched",
@@ -115,11 +119,12 @@
       "checkpoint": "artifacts/country-search-01/new-zealand/tau-05-beta-11/run/trunc/New Zealand/ours_3epoch",
       "run": "artifacts/country-search-01/new-zealand/tau-05-beta-11/run",
       "paper_mean": 62.3,
-      "acceptance_threshold": 61.66
+      "acceptance_threshold": 61.66,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     },
     "South Africa": {
       "shuffle_seed": 0,
-      "learning_rate": 0.000001,
+      "learning_rate": 1e-06,
       "tau": 0.7,
       "beta": 1.1,
       "status": "matched",
@@ -132,7 +137,12 @@
       "checkpoint": "artifacts/original-01/trunc/South Africa/ours_3epoch",
       "run": "artifacts/original-01",
       "paper_mean": 64.17,
-      "acceptance_threshold": 63.76
+      "acceptance_threshold": 63.76,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     }
-  }
+  },
+  "selection_source_revisions": [
+    "33a68c94aec5e906331049dde2961c80c853845d",
+    "9b6e916cc57e69db590fb420c1bfe8b2897881a1"
+  ]
 }
