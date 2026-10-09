@@ -75,5 +75,23 @@ class CountryDefaultsTests(unittest.TestCase):
         self.assertTrue(old.isdisjoint(new))
 
 
+    def test_israel_plan_is_bounded_and_does_not_repeat_prior_trials(self):
+        from scripts.country_search import CANDIDATES
+        plan = json.loads((REPO / 'configs/israel_search.json').read_text())
+        previous = json.loads((REPO / 'configs/remaining_search.json').read_text())
+        settings = load_settings(DEFAULT_SETTINGS)
+        self.assertEqual(plan['countries'], ['Israel'])
+        self.assertEqual(plan['baselines']['Israel'], settings['countries']['Israel']['run'])
+        self.assertEqual(len(plan['candidates']), 4)
+        signature = lambda config: tuple(config[key] for key in BASE)
+        old = {signature(c) for c in CANDIDATES + previous['candidates']}
+        new = [signature(c) for c in plan['candidates']]
+        self.assertEqual(len(new), len(set(new)))
+        self.assertTrue(old.isdisjoint(new))
+        original = (REPO / 'preferences.py').read_text()
+        for config in plan['candidates']:
+            compile(trial_source(original, 'Israel', config), '<israel-trial>', 'exec')
+
+
 if __name__ == '__main__':
     unittest.main()

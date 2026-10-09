@@ -1,0 +1,38 @@
+{
+  "countries": [
+    "Israel"
+  ],
+  "baselines": {
+    "Israel": "artifacts/country-search-02/israel/beta-08/run"
+  },
+  "candidates": [
+    {
+      "shuffle_seed": 1,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 0.8,
+      "name": "best-shuffle-1"
+    },
+    {
+      "shuffle_seed": 2,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 0.8,
+      "name": "best-shuffle-2"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.6,
+      "beta": 0.8,
+      "name": "beta08-tau06"
+    },
+    {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.7,
+      "beta": 0.8,
+      "name": "beta08-tau07"
+    }
+  ]
+}

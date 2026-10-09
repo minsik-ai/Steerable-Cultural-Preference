@@ -207,3 +207,12 @@ environment matches the lock. Promoted these settings and their checkpoint/sourc
 provenance to country_defaults.json. Six countries meet the declared threshold;
 Israel is still provisional. The monitor remains paused and no extra jobs were
 submitted by this status check.
+
+
+## Israel targeted follow-up authorization
+
+User requested further improvement after best overall 66.1972% (188/284 correct).
+The best model recovers 39/105 reference mistakes and retains 149/179 reference
+correct pairs. Four more correct pairs cross the 67.30% threshold. New plan:
+`configs/israel_search.json`; diagnostic and four trials only, preserving the
+original execution semantics. No other country is included.

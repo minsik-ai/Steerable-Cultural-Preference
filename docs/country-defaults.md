@@ -57,3 +57,21 @@ accuracy to 66.1972% at beta 0.8. Both promoted checkpoints passed reload
 validation. Israel remains 1.1028 percentage points below its 67.30% acceptance
 threshold. No further trials are running. These settings were promoted on
 2026-10-09; previous checkpoints remain available.
+
+## Targeted Israel follow-up
+
+The user authorized four additional Israel-only trials after the second search.
+`configs/israel_search.json` fixes beta=0.8 and LR=1e-6, and tries shuffle seeds
+1/2 at tau=0.5, then tau=0.6/0.7 with shuffle seed 0. Batch size 8 and 1024 steps
+remain unchanged. Stop on the first validated overall score >=67.30%. The other
+six countries are not retrained.
+
+Before training, a separate diagnostic rescores the current Israel checkpoint
+on the same nine users and 284 pairs: five controlled scoring seeds with dropout
+active, plus one eval-mode pass. It validates the global RM baseline and the
+105/179 pair partition before comparing variability. Its no-grad scoring and
+eval-mode result are explicitly diagnostic-only; neither changes original
+training, the original reported scores, or the selection criterion.
+
+Source snapshot, diagnostic JSON, per-trial artifacts, and status are saved under
+`artifacts/israel-search-03`. The scheduled monitor remains paused.
