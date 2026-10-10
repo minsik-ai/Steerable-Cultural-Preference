@@ -176,3 +176,8 @@ The separate [Tulu pilot](docs/tulu-replication.md) compares baseline input
 formats, validates LoRA training/export, and runs bounded country pilots using
 `configs/tulu_pilot.json`. Missing historical LoRA/preprocessing details are
 explicit assumptions; successful execution alone is not paper reproduction.
+
+The [matched Tulu method comparison](docs/tulu-method-comparison.md) evaluates
+full-data fine-tuning, weighting-only, and filtering plus weighting at equal
+optimizer-step budgets and LoRA capacity. Reports show improvement against the
+trained full-data comparator, not only against the unmodified global model.

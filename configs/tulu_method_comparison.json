@@ -1,0 +1,26 @@
+{
+  "base_config": "configs/tulu_fp32.json",
+  "countries": [
+    "Chile",
+    "South Africa",
+    "New Zealand",
+    "Australia",
+    "Mexico",
+    "Israel",
+    "Canada"
+  ],
+  "methods": [
+    "full_data",
+    "weighted_only",
+    "filtered_weighted"
+  ],
+  "learning_rates": [
+    1e-06,
+    1e-05
+  ],
+  "max_steps": 1024,
+  "shuffle_seed": 0,
+  "input_format": "chat-template",
+  "precision": "float32",
+  "interpretation": "Matched full-data LoRA comparator; one-seed exploratory screen, not a guarantee of improvement"
+}

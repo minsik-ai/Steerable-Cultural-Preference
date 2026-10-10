@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 COUNTRIES = ['Chile', 'South Africa', 'New Zealand', 'Australia', 'Mexico', 'Israel', 'Canada']
 PAPER_GLOBAL = dict(zip(COUNTRIES, [63.64, 63.35, 61.56, 66.18, 51.64, 62.68, 68.79]))
 FORMATS = ('legacy-pair', 'chat-template')
+METHODS = ('full_data', 'weighted_only', 'filtered_weighted')
 
 
 def write_json(path, value):
@@ -31,6 +32,8 @@ def validate_config(config):
             raise ValueError(f'{key} must be a pinned 40-character commit SHA')
     if config['countries'] != COUNTRIES:
         raise ValueError('Baseline must include the seven countries in canonical order')
+    if config.get('method', 'filtered_weighted') not in METHODS:
+        raise ValueError('Unknown training method')
     if config.get('torch_dtype', 'bfloat16') not in ('bfloat16', 'float32'):
         raise ValueError('torch_dtype must be bfloat16 or float32')
     if config.get('max_length', 2048) <= 0:
@@ -225,6 +228,26 @@ def summarize_updates(model, before, gradients):
     return groups
 
 
+def select_pairs(pairs, reference, method, tau):
+    if method not in METHODS:
+        raise ValueError(f'Unknown method: {method}')
+    if method in ('full_data', 'weighted_only'):
+        return list(pairs)
+    if not 0 < tau < 1:
+        raise ValueError('Filtering threshold must be between zero and one')
+    cutoff = math.log(tau / (1 - tau))
+    return [p for p in pairs if reference[p['chosen_id']] - reference[p['rejected_id']] < cutoff]
+
+
+def loss_references(pair, reference, method):
+    if method not in METHODS:
+        raise ValueError(f'Unknown method: {method}')
+    # Equal zero references make the unchanged weighted loss exactly unit-weighted.
+    # Real reference rewards remain intact for reporting and subset construction.
+    return {side: 0. if method == 'full_data' else reference[pair[f'{side}_id']]
+            for side in ('chosen', 'rejected')}
+
+
 def train(config, output, baseline_path, country, input_format, max_steps=None):
     import torch
     from datasets import Dataset
@@ -254,9 +277,8 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
     tau, beta = config.get('tau', .5), config.get('beta', 1.)
     if not 0 < tau < 1 or beta <= 0:
         raise ValueError('Require 0 < tau < 1 and beta > 0')
-    # sigmoid(delta) < tau, written as log-odds to avoid overflow.
-    retained = [p for p in training['pairs'] if reference[p['chosen_id']] - reference[p['rejected_id']]
-                < math.log(tau / (1 - tau))]
+    method = config.get('method', 'filtered_weighted')
+    retained = select_pairs(training['pairs'], reference, method, tau)
     if not retained:
         raise ValueError('No training pairs survived filtering')
     features, _ = encode_rows(tokenizer, training['rows'], input_format, max_length)
@@ -264,10 +286,11 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
     samples = []
     for pair in retained:
         sample = {}
+        training_reference = loss_references(pair, reference, method)
         for side in ('chosen', 'rejected'):
             uid = pair[f'{side}_id']
             sample.update({f'{key}_{side}': value for key, value in encoded[uid].items()})
-            sample[f'ref_rewards_{side}'] = [reference[uid]]
+            sample[f'ref_rewards_{side}'] = [training_reference[side]]
         samples.append(sample)
     lora = config['lora']
     for key in ('r', 'target_modules', 'lora_alpha', 'lora_dropout', 'modules_to_save'):
@@ -313,7 +336,11 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
     tokenizer.save_pretrained(str(adapter))
     rewards, test_truncation = score(model, tokenizer, testing['rows'], input_format, max_length,
                                    config.get('score_batch_size', 4))
-    report = {'country': country, 'input_format': input_format, 'evaluation_mode': 'eval; dropout disabled',
+    report = {'country': country, 'method': method, 'input_format': input_format,
+              'actual_epochs': trainer.state.epoch,
+              'nominal_pair_slots': trainer.state.global_step * args.per_device_train_batch_size,
+              'parameterization': 'same LoRA capacity for every method; full_data means all eligible pairs',
+              'loss_weighting': 'unit' if method == 'full_data' else 'SCPO clipped exponential', 'evaluation_mode': 'eval; dropout disabled',
               'max_steps': steps, 'actual_global_step': trainer.state.global_step,
               'training_update_audit': updates, 'bf16_autocast': args.bf16,
               'train_pairs': len(training['pairs']), 'retained_train_pairs': len(retained),

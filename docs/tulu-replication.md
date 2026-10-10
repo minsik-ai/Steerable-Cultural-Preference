@@ -103,3 +103,9 @@ A saved-weight audit found mostly unchanged BF16 score heads despite nonzero
 FP32 LoRA updates. See [precision diagnostics](tulu-diagnostics.md) for the
 bounded next experiments and the distinction between old in-memory and new
 fresh-adapter evaluation metrics.
+
+The next method comparison explicitly includes **full-data fine-tuning** and
+**weighting-only**, alongside filtering plus weighting, using identical LoRA
+capacity and budgets. See [the matched comparison plan](tulu-method-comparison.md).
+The paper's strongest average Tulu variant is weighting-only; a small gain over
+the global RM alone is not the improvement criterion for this experiment.

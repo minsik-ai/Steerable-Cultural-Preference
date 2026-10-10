@@ -249,3 +249,18 @@ gradient/weight-change auditing to the separate Tulu runner. The next
 bounded sequence is a saved-adapter precision comparison, all-country FP32
 baseline, then three Chile-only training controls. All 23 tests pass on PW.
 Original sources and previously produced artifacts/defaults remain unchanged.
+
+## Matched full-data baseline comparison
+
+User requested weighting-only and emphasized beating full-data fine-tuning.
+Added explicit full_data/weighted_only/filtered_weighted modes to the separate
+Tulu runner, leaving the original trainer/source untouched. Full-data uses unit
+weights with a mathematically equivalent zero-reference loss input; true global
+references remain intact for reporting. Loss and gradient equivalence are tested.
+
+Configured 42 matched runs (seven countries, three methods, two learning rates),
+1024 steps, FP32, at most two GPUs, gated on successful prior precision/Chile
+controls. Full-data baselines get multiple data passes. Summary checks complete
+cohorts and compares each method against both matched-rate and strongest tested
+full-data results, without dropping losing cases. 27 tests passed on PW. Outputs
+are artifacts/tulu-method-comparison-03; no scheduled monitor is enabled.
