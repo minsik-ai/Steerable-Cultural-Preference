@@ -31,6 +31,8 @@ def validate_config(config):
             raise ValueError(f'{key} must be a pinned 40-character commit SHA')
     if config['countries'] != COUNTRIES:
         raise ValueError('Baseline must include the seven countries in canonical order')
+    if config.get('torch_dtype', 'bfloat16') not in ('bfloat16', 'float32'):
+        raise ValueError('torch_dtype must be bfloat16 or float32')
     if config.get('max_length', 2048) <= 0:
         raise ValueError('max_length must be positive')
     return config
@@ -135,7 +137,7 @@ def metrics(pairs, rewards, reference=None):
 def load_model(config, tokenizer):
     import torch
     from transformers import AutoModelForSequenceClassification
-    dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
+    dtype = getattr(torch, config.get('torch_dtype', 'bfloat16')) if torch.cuda.is_available() else torch.float32
     model = AutoModelForSequenceClassification.from_pretrained(
         config['model_name'], revision=config['model_revision'], torch_dtype=dtype,
         attn_implementation='sdpa', num_labels=1, low_cpu_mem_usage=True)
@@ -195,6 +197,34 @@ def baseline(config, output, split_path=None):
     write_json(output / 'report.json', report)
 
 
+def summarize_updates(model, before, gradients):
+    """Report trainable weight changes and first observed gradient-contribution norms by role."""
+    groups = {}
+    for name, parameter in model.named_parameters():
+        if name not in before:
+            continue
+        group = 'lora_A' if 'lora_A' in name else 'lora_B' if 'lora_B' in name else 'score_head'
+        current = parameter.detach().cpu().float()
+        initial = before[name].float()
+        delta = current - initial
+        stats = groups.setdefault(group, dict(elements=0, changed_elements=0, delta_squared_sum=0.,
+                                               first_observed_grad_squared_sum=0., parameters_with_gradient=0,
+                                               parameter_tensors=0, dtypes=[]))
+        stats['elements'] += delta.numel()
+        stats['changed_elements'] += int((delta != 0).sum())
+        stats['delta_squared_sum'] += float(delta.square().sum())
+        stats['parameter_tensors'] += 1
+        stats['parameters_with_gradient'] += name in gradients
+        stats['first_observed_grad_squared_sum'] += gradients.get(name, 0.) ** 2
+        if str(parameter.dtype) not in stats['dtypes']:
+            stats['dtypes'].append(str(parameter.dtype))
+    for stats in groups.values():
+        stats['delta_l2'] = math.sqrt(stats.pop('delta_squared_sum'))
+        stats['first_observed_grad_l2'] = math.sqrt(stats.pop('first_observed_grad_squared_sum'))
+        stats['changed_fraction'] = stats['changed_elements'] / stats['elements']
+    return groups
+
+
 def train(config, output, baseline_path, country, input_format, max_steps=None):
     import torch
     from datasets import Dataset
@@ -207,6 +237,8 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
     for key in ('model_name', 'model_revision', 'dataset_name', 'dataset_revision'):
         if config[key] != baseline_manifest['config'][key]:
             raise ValueError(f'Baseline mismatch: {key}')
+    if config.get('torch_dtype', 'bfloat16') != baseline_manifest['config'].get('torch_dtype', 'bfloat16'):
+        raise ValueError('Baseline precision mismatch')
     if config.get('max_length', 2048) != baseline_manifest['config'].get('max_length', 2048):
         raise ValueError('Baseline maximum length mismatch')
     data = json.loads((baseline_path / 'data.json').read_text())
@@ -251,13 +283,31 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
         model.enable_input_require_grads()
     args = RewardConfig(output_dir=str(output / 'trainer'), per_device_train_batch_size=config.get('batch_size', 8),
                         max_steps=steps, learning_rate=config.get('learning_rate', 1e-6),
-                        gradient_checkpointing=gradient_checkpointing, bf16=torch.cuda.is_available(),
+                        gradient_checkpointing=gradient_checkpointing,
+                        bf16=torch.cuda.is_available() and config.get('torch_dtype', 'bfloat16') == 'bfloat16',
                         eval_strategy='no', save_strategy='no', logging_steps=1, report_to='none',
                         max_length=max_length, remove_unused_columns=False, seed=42)
     trainer = OurRewardTrainer(model=model, args=args, beta=beta,
                                data_collator=OurRewardDataCollatorWithPadding(tokenizer),
                                train_dataset=Dataset.from_list(samples).shuffle(seed=config.get('shuffle_seed', 0)))
-    trainer.train()
+    before = {name: parameter.detach().cpu().clone() for name, parameter in model.named_parameters()
+              if parameter.requires_grad}
+    first_gradients = {}
+    handles = []
+    for name, parameter in model.named_parameters():
+        if parameter.requires_grad:
+            def capture(gradient, key=name):
+                if key not in first_gradients:
+                    first_gradients[key] = gradient.detach().float().norm().item()
+            handles.append(parameter.register_hook(capture))
+    try:
+        trainer.train()
+    finally:
+        for handle in handles:
+            handle.remove()
+    updates = summarize_updates(model, before, first_gradients)
+    del before
+    write_json(output / 'training-update-audit.json', updates)
     adapter = output / 'adapter'
     model.save_pretrained(str(adapter), safe_serialization=True)
     tokenizer.save_pretrained(str(adapter))
@@ -265,6 +315,7 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
                                    config.get('score_batch_size', 4))
     report = {'country': country, 'input_format': input_format, 'evaluation_mode': 'eval; dropout disabled',
               'max_steps': steps, 'actual_global_step': trainer.state.global_step,
+              'training_update_audit': updates, 'bf16_autocast': args.bf16,
               'train_pairs': len(training['pairs']), 'retained_train_pairs': len(retained),
               'train_truncation': truncation, 'test_truncation': test_truncation,
               'metrics': metrics(testing['pairs'], rewards, reference_test),
@@ -282,11 +333,24 @@ def train(config, output, baseline_path, country, input_format, max_steps=None):
     repeated, _ = score(model, tokenizer, probe, input_format, max_length, 1)
     before = torch.tensor(list(expected.values()))
     after = torch.tensor(list(actual.values()))
-    torch.testing.assert_close(before, after, rtol=.01, atol=.05)
+    rtol, atol = (1e-5, 1e-5) if config.get('torch_dtype', 'bfloat16') == 'float32' else (.01, .05)
+    torch.testing.assert_close(before, after, rtol=rtol, atol=atol)
     torch.testing.assert_close(after, torch.tensor(list(repeated.values())), rtol=0, atol=1e-6)
     write_json(output / 'validation.json', {'passed': True, 'probe_count': len(probe),
                 'reload_max_abs_error': (before - after).abs().max().item(),
-                'deterministic_eval': True, 'reload_rtol': .01, 'reload_atol': .05})
+                'deterministic_eval': True, 'reload_rtol': rtol, 'reload_atol': atol})
+    reloaded_rewards, _ = score(model, tokenizer, testing['rows'], input_format, max_length,
+                                config.get('score_batch_size', 4))
+    report['in_memory_metrics'] = report['metrics']
+    report['in_memory_rewards'] = report['rewards']
+    report['reload_pair_ranking_changes'] = sum(
+        (rewards[p['chosen_id']] > rewards[p['rejected_id']]) !=
+        (reloaded_rewards[p['chosen_id']] > reloaded_rewards[p['rejected_id']])
+        for p in testing['pairs'])
+    report['metrics'] = metrics(testing['pairs'], reloaded_rewards, reference_test)
+    report['rewards'] = reloaded_rewards
+    report['evaluation_mode'] = 'fresh adapter reload, eval, no autocast'
+    write_json(output / 'report.json', report)
 
 
 def main():

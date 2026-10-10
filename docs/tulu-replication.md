@@ -92,3 +92,14 @@ training and fresh adapter reload. The full pinned model snapshot downloaded
 successfully. Real PRISM preprocessing produced the same country pair counts as
 the DeBERTa run with zero orphan users. Tokenizer pad ID 128256 is within model
 vocabulary size 128264. GPU baseline/pilot results remain pending at submission.
+
+## First pilot outcome and follow-up
+
+All seven 128-step pilots and the preflight completed. Chat-template global
+macro accuracy was 62.2754%, trained macro 62.5069%; legacy-pair global macro
+was 52.4291%. No evaluated row was truncated. The baseline does not match the
+paper exactly. Reference-misranked corrections were only 0-1.94% by country.
+A saved-weight audit found mostly unchanged BF16 score heads despite nonzero
+FP32 LoRA updates. See [precision diagnostics](tulu-diagnostics.md) for the
+bounded next experiments and the distinction between old in-memory and new
+fresh-adapter evaluation metrics.

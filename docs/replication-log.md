@@ -235,3 +235,17 @@ pinned model snapshot downloaded; real PRISM pairing and tokenizer compatibility
 passed. Raw evidence is artifacts/tulu-setup/{tests.log,download.log,data-preflight.log}.
 Model pad token 128256 is valid within vocab 128264. No original experiment file
 was edited. GPU jobs use a frozen source snapshot and explicit dependencies.
+
+## Tulu weak-learning investigation
+
+All initial Tulu jobs (55337 and array 55338) completed. Saved adapter audit:
+LoRA B FP32 nonzero, score heads BF16 with only 61-66/4096 elements changed,
+retained loss-weight means 0.475-0.544. This supports testing precision before
+expanding model/hyperparameter search. Baseline discrepancy is 0.555 points mean
+absolute country error with the chat template; no test rows were truncated.
+
+Added explicit precision controls, full-set fresh-reload metrics, and first-observed
+gradient/weight-change auditing to the separate Tulu runner. The next
+bounded sequence is a saved-adapter precision comparison, all-country FP32
+baseline, then three Chile-only training controls. All 23 tests pass on PW.
+Original sources and previously produced artifacts/defaults remain unchanged.
