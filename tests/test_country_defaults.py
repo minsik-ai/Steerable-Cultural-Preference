@@ -22,7 +22,10 @@ class CountryDefaultsTests(unittest.TestCase):
         self.assertEqual(settings['countries']['Mexico']['learning_rate'], 1e-5)
         for entry in settings['countries'].values():
             expected = 'matched' if entry['observed']['overall'] >= entry['acceptance_threshold'] else 'provisional'
-            self.assertEqual(entry['status'], expected)
+            if entry['status'] == 'accepted':
+                self.assertTrue(entry.get('acceptance_note'))
+            else:
+                self.assertEqual(entry['status'], expected)
         self.assertEqual(settings['countries']['Australia']['shuffle_seed'], 2)
         self.assertEqual(settings['countries']['Israel']['beta'], 0.8)
 
@@ -81,7 +84,7 @@ class CountryDefaultsTests(unittest.TestCase):
         previous = json.loads((REPO / 'configs/remaining_search.json').read_text())
         settings = load_settings(DEFAULT_SETTINGS)
         self.assertEqual(plan['countries'], ['Israel'])
-        self.assertEqual(plan['baselines']['Israel'], settings['countries']['Israel']['run'])
+        self.assertEqual(plan['baselines']['Israel'], 'artifacts/country-search-02/israel/beta-08/run')
         self.assertEqual(len(plan['candidates']), 4)
         signature = lambda config: tuple(config[key] for key in BASE)
         old = {signature(c) for c in CANDIDATES + previous['candidates']}

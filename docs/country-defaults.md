@@ -1,18 +1,18 @@
 # Recorded country defaults
 
-Machine-readable source: `configs/country_defaults.json`. The default launcher reads this file; no per-country flags are needed. All entries use batch size 8 and 1024 steps. Australia uses shuffle seed 2; the other countries use shuffle seed 0. Original model/split seeds remain 0 and Trainer seed remains its original implicit 42.
+Machine-readable source: `configs/country_defaults.json`. The default launcher reads this file; no per-country flags are needed. All entries use batch size 8 and 1024 steps. Australia and Israel use shuffle seed 2; the other countries use shuffle seed 0. Original model/split seeds remain 0 and Trainer seed remains its original implicit 42.
 
 | Country | LR | Tau | Beta | Overall | Misranked | Status |
 |---|---:|---:|---:|---:|---:|---|
 | Australia | 1e-06 | 0.5 | 1 | 59.85% | 35.54% | matched |
 | Canada | 1e-06 | 0.7 | 1.1 | 66.18% | 27.74% | matched |
 | Chile | 1e-06 | 0.5 | 1.1 | 60.61% | 37.62% | matched |
-| Israel | 1e-06 | 0.5 | 0.8 | 66.20% | 37.14% | provisional |
+| Israel | 1e-06 | 0.5 | 0.8 | 66.90% | 39.05% | accepted by user |
 | Mexico | 1e-05 | 0.7 | 1.1 | 64.75% | 54.24% | matched |
 | New Zealand | 1e-06 | 0.5 | 1.1 | 62.40% | 44.52% | matched |
 | South Africa | 1e-06 | 0.7 | 1.1 | 65.48% | 27.72% | matched |
 
-These observed results come from retained, validated checkpoints, whose exact relative paths and both metrics are stored in the JSON. They are per-country fixed-test selections, not a common-configuration three-seed aggregate. Israel remains a best-so-far provisional default and has not met its paper threshold.
+These observed results come from retained, validated checkpoints, whose exact relative paths and both metrics are stored in the JSON. They are per-country fixed-test selections, not a common-configuration three-seed aggregate. The user accepted Israel at 66.90%; it remains below the earlier 67.30% matching threshold.
 
 ## Reproduce
 
@@ -75,3 +75,5 @@ training, the original reported scores, or the selection criterion.
 
 Source snapshot, diagnostic JSON, per-trial artifacts, and status are saved under
 `artifacts/israel-search-03`. The scheduled monitor remains paused.
+
+Israel acceptance (2026-10-10): promote best-shuffle-2 from israel-search-03. This changes training-data shuffle seed to 2, not the split seed (still 0). No further Israel search is needed.

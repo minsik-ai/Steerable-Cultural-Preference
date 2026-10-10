@@ -216,3 +216,22 @@ The best model recovers 39/105 reference mistakes and retains 149/179 reference
 correct pairs. Four more correct pairs cross the 67.30% threshold. New plan:
 `configs/israel_search.json`; diagnostic and four trials only, preserving the
 original execution semantics. No other country is included.
+
+## Accepted Israel default and Tulu initialization (2026-10-10)
+
+User accepted Israel's 66.9014% result as sufficient. Promoted shuffle seed 2,
+LR=1e-6, tau=0.5, beta=0.8 from israel-search-03/best-shuffle-2; split remains 0.
+Status is `accepted`, not `matched`, because it is below the earlier threshold.
+Other six settings remain unchanged.
+
+Tulu recipe audit found no rank/target configuration in current/history code.
+The model is ungated and pinned to revision 84e607acab8adab64fa8cdaa26a9391d28362802.
+A separate baseline/LoRA pilot runner, explicit assumptions config, tests, and
+Slurm dependency stages are documented in docs/tulu-replication.md. No model
+publication, external messages, or scheduled monitor restart are involved.
+
+Tulu pre-submission evidence: 20 tests passed in the locked PW environment;
+pinned model snapshot downloaded; real PRISM pairing and tokenizer compatibility
+passed. Raw evidence is artifacts/tulu-setup/{tests.log,download.log,data-preflight.log}.
+Model pad token 128256 is valid within vocab 128264. No original experiment file
+was edited. GPU jobs use a frozen source snapshot and explicit dependencies.

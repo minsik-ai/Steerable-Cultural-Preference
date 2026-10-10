@@ -12,7 +12,7 @@
   "model_seed": 0,
   "trainer_seed": 42,
   "trainer_data_seed": null,
-  "interpretation": "Per-country exploratory fixed-test selections; Israel remains provisional",
+  "interpretation": "Per-country exploratory fixed-test selections; Israel accepted by user below prior matching threshold",
   "countries": {
     "Australia": {
       "shuffle_seed": 2,
@@ -69,22 +69,23 @@
       "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
     },
     "Israel": {
-      "shuffle_seed": 0,
+      "shuffle_seed": 2,
       "learning_rate": 1e-06,
       "tau": 0.5,
       "beta": 0.8,
-      "status": "provisional",
+      "status": "accepted",
       "observed": {
-        "overall": 66.19718309859155,
+        "overall": 66.90140845070422,
         "global_overall": 63.02816901408451,
-        "misranked": 37.142857142857146,
+        "misranked": 39.04761904761905,
         "global_misranked": 0
       },
-      "checkpoint": "artifacts/country-search-02/israel/beta-08/run/trunc/Israel/ours_3epoch",
-      "run": "artifacts/country-search-02/israel/beta-08/run",
+      "checkpoint": "artifacts/israel-search-03/israel/best-shuffle-2/run/trunc/Israel/ours_3epoch",
+      "run": "artifacts/israel-search-03/israel/best-shuffle-2/run",
       "paper_mean": 67.84,
       "acceptance_threshold": 67.3,
-      "selection_source_revision": "9b6e916cc57e69db590fb420c1bfe8b2897881a1"
+      "selection_source_revision": "e8f40f811c95744d5a5f317d8802eb44021a896e",
+      "acceptance_note": "User accepted 66.9014% as sufficient on 2026-10-10; below prior 67.30% matching threshold"
     },
     "Mexico": {
       "shuffle_seed": 0,
@@ -143,6 +144,7 @@
   },
   "selection_source_revisions": [
     "33a68c94aec5e906331049dde2961c80c853845d",
-    "9b6e916cc57e69db590fb420c1bfe8b2897881a1"
+    "9b6e916cc57e69db590fb420c1bfe8b2897881a1",
+    "e8f40f811c95744d5a5f317d8802eb44021a896e"
   ]
 }

@@ -169,3 +169,10 @@ paper-score threshold. `scripts/country_search_pw.sbatch` runs five country
 workers, at most three at once; Canada and South Africa retain their existing
 models. Trial configurations, both evaluation metrics, source diffs, and every
 attempt are preserved. These are exploratory configuration matches.
+
+### Tulu replication
+
+The separate [Tulu pilot](docs/tulu-replication.md) compares baseline input
+formats, validates LoRA training/export, and runs bounded country pilots using
+`configs/tulu_pilot.json`. Missing historical LoRA/preprocessing details are
+explicit assumptions; successful execution alone is not paper reproduction.
