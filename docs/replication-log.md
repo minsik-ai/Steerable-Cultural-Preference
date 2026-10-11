@@ -264,3 +264,18 @@ controls. Full-data baselines get multiple data passes. Summary checks complete
 cohorts and compares each method against both matched-rate and strongest tested
 full-data results, without dropping losing cases. 27 tests passed on PW. Outputs
 are artifacts/tulu-method-comparison-03; no scheduled monitor is enabled.
+
+## South Africa-only Tulu search
+
+The user restricted focus to South Africa, fixed LR at 1e-6, and accepted the
+other country models conditional on beating their starting models. Verified
+South Africa global=63.3452%, full-data=64.0569%, weighting-only=63.3452%,
+filtered+weighted=60.8541%. Five other filtered models beat global; Australia
+is an exception (65.6934% below global66.4234%, weighting-only ties), flagged to
+user and deferred without launching extra country work.
+
+New bounded plan tests three shorter filtered budgets, a gentler filter, and
+two gentler weighting settings. It adds an equal-step full-data control only
+when a candidate beats the established references. At most six candidates plus
+three controls, one GPU, no 1e-5 candidates. It stops on a validated improvement
+and retains every trial. See docs/tulu-south-africa.md.
