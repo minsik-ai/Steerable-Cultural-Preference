@@ -1,0 +1,48 @@
+{
+  "country": "Australia",
+  "base_config": "configs/tulu_fp32.json",
+  "learning_rate": 1e-06,
+  "shuffle_seed": 0,
+  "input_format": "chat-template",
+  "baseline": "artifacts/tulu-diagnostics-02/fp32-baseline",
+  "full_data": "artifacts/tulu-method-comparison-03/runs/australia-lr1e-06-full_data",
+  "frozen_other_countries": [
+    "Chile",
+    "South Africa",
+    "New Zealand",
+    "Mexico",
+    "Israel",
+    "Canada"
+  ],
+  "candidates": [
+    {
+      "name": "filtered-128",
+      "method": "filtered_weighted",
+      "max_steps": 128,
+      "tau": 0.5,
+      "beta": 1.0
+    },
+    {
+      "name": "filtered-256",
+      "method": "filtered_weighted",
+      "max_steps": 256,
+      "tau": 0.5,
+      "beta": 1.0
+    },
+    {
+      "name": "filter-07-1024",
+      "method": "filtered_weighted",
+      "max_steps": 1024,
+      "tau": 0.7,
+      "beta": 1.0
+    },
+    {
+      "name": "weighted-beta2",
+      "method": "weighted_only",
+      "max_steps": 1024,
+      "tau": 0.5,
+      "beta": 2.0
+    }
+  ],
+  "criterion": "strictly beat starting model, established full-data checkpoint, and equal-step full-data control; fresh adapter evaluation"
+}

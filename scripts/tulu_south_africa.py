@@ -1,4 +1,4 @@
-"""Bounded South Africa search at fixed LR, with equal-step full-data checks."""
+"""Bounded single-country Tulu search at fixed LR, with equal-step full-data checks."""
 import argparse
 import json
 import math
@@ -28,7 +28,7 @@ def load_result(folder, country, method, steps):
             or config['learning_rate'] != 1e-6 or config.get('shuffle_seed', 0) != 0
             or config.get('torch_dtype') != 'float32' or report['input_format'] != 'chat-template'
             or report['evaluation_mode'] != 'fresh adapter reload, eval, no autocast'):
-        raise ValueError('Result does not match fixed South Africa protocol')
+        raise ValueError('Result does not match fixed country protocol')
     for metric in (report['metrics'], report['metrics']['reference_misranked']):
         value = metric['accuracy']
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
@@ -54,8 +54,8 @@ def beats(score, starting, full_data):
 
 
 def search(source, artifacts, output, plan):
-    if plan['country'] != 'South Africa' or plan['learning_rate'] != 1e-6 or plan['shuffle_seed'] != 0:
-        raise ValueError('This search is South Africa only with LR1e-6/shuffle0')
+    if plan['country'] not in ('South Africa', 'Australia') or plan['learning_rate'] != 1e-6 or plan['shuffle_seed'] != 0:
+        raise ValueError('This search permits South Africa or Australia only, with LR1e-6/shuffle0')
     country = plan['country']
     original_full = load_result(artifacts/plan['full_data'], country, 'full_data', 1024)
     starting = original_full['baseline_metrics']['accuracy']
@@ -129,6 +129,8 @@ if __name__ == '__main__':
     parser.add_argument('--source',type=Path,required=True)
     parser.add_argument('--artifacts',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--plan',type=Path,help='explicit country plan; defaults to South Africa')
     args=parser.parse_args()
-    plan=json.loads((args.source/'configs/tulu_south_africa.json').read_text())
+    plan_path=args.plan or args.source/'configs/tulu_south_africa.json'
+    plan=json.loads(plan_path.read_text())
     search(args.source.resolve(),args.artifacts.resolve(),args.output.resolve(),plan)

@@ -15,7 +15,9 @@ SOURCE="${1:?frozen source snapshot}"
 PY="${2:?python executable}"
 ARTIFACTS="${3:?repository artifact root}"
 OUT="${4:?new search output directory}"
+EXTRA=()
+if [[ $# -eq 5 ]]; then EXTRA=(--plan "$5"); fi
 export HF_HOME="${HF_HOME:-/home/minsik/hf}"
 export OMP_NUM_THREADS=8 TOKENIZERS_PARALLELISM=false PYTHONUNBUFFERED=1
 "$PY" -c 'import torch; assert torch.cuda.is_available()'
-"$PY" "$SOURCE/scripts/tulu_south_africa.py" --source "$SOURCE" --artifacts "$ARTIFACTS" --output "$OUT"
+"$PY" "$SOURCE/scripts/tulu_south_africa.py" --source "$SOURCE" --artifacts "$ARTIFACTS" --output "$OUT" "${EXTRA[@]}"

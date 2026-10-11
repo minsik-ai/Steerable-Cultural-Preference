@@ -55,3 +55,7 @@ equal-step full-data control is stronger, enforce South-Africa-only scope and
 fixed LR, and prevent output overwrite. The actual saved 64.0569% full-data
 reference passed the result loader. Original-source fidelity, static checks,
 Python compilation, and Slurm syntax pass.
+
+Follow-up: the user also authorized a separate, four-setting Australia search.
+The running South Africa job keeps its frozen source and original six candidates;
+there is no duplicate South Africa submission. See `docs/tulu-australia.md`.

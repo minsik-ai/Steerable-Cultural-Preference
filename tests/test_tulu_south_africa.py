@@ -55,3 +55,22 @@ class SouthAfricaSearchTests(unittest.TestCase):
         self.assertEqual(len(plan['candidates']),6)
         self.assertEqual(len(set(plan['frozen_other_countries'])),6)
         self.assertNotIn('South Africa',plan['frozen_other_countries'])
+
+
+class AustraliaPlanTests(unittest.TestCase):
+    def test_australia_has_four_new_settings_at_fixed_lr(self):
+        root=Path(__file__).resolve().parents[1]
+        plan=json.loads((root/'configs/tulu_australia.json').read_text())
+        self.assertEqual(plan['country'],'Australia')
+        self.assertEqual(plan['learning_rate'],1e-6)
+        self.assertEqual([c['name'] for c in plan['candidates']],
+                         ['filtered-128','filtered-256','filter-07-1024','weighted-beta2'])
+        self.assertNotIn('Australia',plan['frozen_other_countries'])
+        self.assertIn('South Africa',plan['frozen_other_countries'])
+        self.assertIn('australia-lr1e-06-full_data',plan['full_data'])
+
+    def test_unrequested_country_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            with self.assertRaises(ValueError):
+                search(root,root,root/'output',dict(country='Canada',learning_rate=1e-6,shuffle_seed=0))

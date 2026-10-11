@@ -279,3 +279,12 @@ two gentler weighting settings. It adds an equal-step full-data control only
 when a candidate beats the established references. At most six candidates plus
 three controls, one GPU, no 1e-5 candidates. It stops on a validated improvement
 and retains every trial. See docs/tulu-south-africa.md.
+
+## Add Australia ablations without duplicating South Africa
+
+User asked for a few ablations on Australia too. Job57313 was running: South
+Africa filtered-128 tied global at63.3452%, filtered-256 underway. It retains its
+original frozen source. Added explicit Australia-only plan with four candidates
+at LR1e-6, the same equal-budget full-data controls, and fresh-reload validation.
+Other countries remain out of scope. Starting Australia66.4234% is higher than
+its full-data reference65.4501%, so a mere full-data win is insufficient.
