@@ -4,6 +4,10 @@ Paper: [Steerable Cultural Preference Optimization of Reward Models](https://arx
 
 Accepted to **Pluralistic Alignment @ ICML 2026**.
 
+**Released models:** [Seven SCPO DeBERTa country reward models](https://huggingface.co/collections/MulticulturalAlignment/scpo-deberta-country-reward-models-6acd6ef257ba2b9f33b8db95)
+(CC-BY-NC-4.0). Each includes weights, tokenizer, exact country training code,
+settings and documented original-protocol results. Tülu remains experimental.
+
 SCPO adapts a *global* reward model into *culturally steerable* reward models. Starting
 from an off-the-shelf RM trained on aggregate human preferences, it re-trains the model
 per country so that it better reflects the preferences of users residing in that country —
