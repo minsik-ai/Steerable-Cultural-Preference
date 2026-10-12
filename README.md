@@ -4,9 +4,23 @@ Paper: [Steerable Cultural Preference Optimization of Reward Models](https://arx
 
 Accepted to **Pluralistic Alignment @ ICML 2026**.
 
-**Released models:** [Seven SCPO DeBERTa country reward models](https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95)
-(MIT). Each includes weights, tokenizer, exact country training code,
-settings and documented original-protocol results. Tülu remains experimental.
+## News
+
+> **2026-10-12 — SCPO country reward models are now available!**
+> Download all seven models from the [Hugging Face collection](https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95).
+> Released under **MIT**, with weights, tokenizers, country settings, exact training code, and paper citations.
+>
+> [Mexico](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-mexico) ·
+> [Chile](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-chile) ·
+> [New Zealand](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-new-zealand) ·
+> [Canada](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-canada) ·
+> [Israel](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-israel) ·
+> [South Africa](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-south-africa) ·
+> [Australia](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-australia)
+
+See the [latest replication results](docs/latest-replication.md) and [release record](release/deberta/README.md).
+
+## Overview
 
 SCPO adapts a *global* reward model into *culturally steerable* reward models. Starting
 from an off-the-shelf RM trained on aggregate human preferences, it re-trains the model
@@ -173,28 +187,3 @@ paper-score threshold. `scripts/country_search_pw.sbatch` runs five country
 workers, at most three at once; Canada and South Africa retain their existing
 models. Trial configurations, both evaluation metrics, source diffs, and every
 attempt are preserved. These are exploratory configuration matches.
-
-### Tulu replication
-
-**Current Tülu default:** [chat inputs with shared evaluation](docs/tulu-chat-evaluation.md).
-DeBERTa retains the original experiment. The user-authorized Tülu chat profile
-uses model-specific chat formatting with DeBERTa's original evaluation loops,
-test pairs, metrics, per-interaction batches, and in-memory scoring mode/RNG.
-Training uses chat inputs, dynamic padding and a 2048-token cap. The authorized
-learning-rate comparison includes 1e-6 and 1e-5; `_lr1e5` configs select the latter.
-Run `python scripts/tulu_replication.py --config configs/tulu_chat_protocol.json
---country Chile --output <new-directory>` (on one line).
-See [the evaluation contract](docs/tulu-chat-evaluation.md). Previous deterministic
-Tülu scores are historical diagnostics, not results under this contract.
-The strict raw-input experiment remains available with
-`configs/tulu_original_protocol.json`.
-
-The separate [Tulu pilot](docs/tulu-replication.md) compares baseline input
-formats, validates LoRA training/export, and runs bounded country pilots using
-`configs/tulu_pilot.json`. Missing historical LoRA/preprocessing details are
-explicit assumptions; successful execution alone is not paper reproduction.
-
-The [matched Tulu method comparison](docs/tulu-method-comparison.md) evaluates
-full-data fine-tuning, weighting-only, and filtering plus weighting at equal
-optimizer-step budgets and LoRA capacity. Reports show improvement against the
-trained full-data comparator, not only against the unmodified global model.
