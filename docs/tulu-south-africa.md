@@ -1,5 +1,7 @@
 # Tulu South Africa focus, fixed learning rate 1e-6
 
+> Historical reconstructed-protocol record. Superseded for primary replication by [the original-source rollback](original-protocol-rollback.md). Existing results remain diagnostic evidence.
+
 The user asked to focus on South Africa and leave other countries alone. This
 search runs only South Africa, in FP32 with the same chat template, LoRA capacity,
 split0, shuffle0 and Trainer seed42. Learning rate is fixed to **1e-6**; 1e-5 is

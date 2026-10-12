@@ -172,6 +172,13 @@ attempt are preserved. These are exploratory configuration matches.
 
 ### Tulu replication
 
+**Current default:** [original-source protocol](docs/original-protocol-rollback.md).
+Both backbones now use the unchanged original experiment behavior. Previous Tulu
+reconstruction results and the workflows below are historical diagnostics, not
+comparable primary replication scores. Use `scripts/tulu_replication.py --config
+configs/tulu_original_protocol.json --country Chile --output <new-directory>`.
+
+
 The separate [Tulu pilot](docs/tulu-replication.md) compares baseline input
 formats, validates LoRA training/export, and runs bounded country pilots using
 `configs/tulu_pilot.json`. Missing historical LoRA/preprocessing details are

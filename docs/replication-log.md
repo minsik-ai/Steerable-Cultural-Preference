@@ -288,3 +288,27 @@ original frozen source. Added explicit Australia-only plan with four candidates
 at LR1e-6, the same equal-budget full-data controls, and fresh-reload validation.
 Other countries remain out of scope. Starting Australia66.4234% is higher than
 its full-data reference65.4501%, so a mere full-data win is insufficient.
+
+
+## Original-protocol rollback (2026-10-12)
+
+User requested comparability and rollback of all non-hyperparameter execution
+changes. Full audit and replacement protocol are in docs/original-protocol-rollback.md.
+Archived the reconstructed Tulu runner, blocked its legacy primary CLI, and
+derived both model programs from original preferences.py with only explicit
+hyperparameters/methods and Tulu model/pad/PEFT adaptations. Original sources stay
+unchanged. All earlier Tulu deterministic/fresh-reload scores are historical
+diagnostics, not comparable primary scores against original DeBERTa.
+
+Original Trainer defaults were verified in the pinned environment: gradient
+checkpointing=False, bf16=False, fp16=False, seed42, data_seedNone, accumulation1,
+AdamW Torch, linear scheduler, warmup0, max_grad_norm1. All overrides were removed
+from the primary source-derived programs. The external runtime/version preflight
+passed. A real tiny Tulu path confirmed grad-enabled scoring, training-mode
+post-training evaluation, fixed512 training padding and adapter export.
+
+Rollback verification completed: all42 tests pass on PW. The source-backed tiny
+Llama test confirms actual model modes, grad state, 512-token training batches,
+per-interaction scoring and adapter export. Archived reconstruction tests still
+pass under their explicitly renamed module. New summarizer rejects mixed/old
+protocol results and incomplete grids. Full-size paired results remain pending.

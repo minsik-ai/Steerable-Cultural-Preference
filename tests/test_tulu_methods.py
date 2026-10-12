@@ -1,6 +1,6 @@
 import unittest
 from types import SimpleNamespace
-from scripts.tulu_replication import select_pairs, loss_references
+from scripts.tulu_reconstructed import select_pairs, loss_references
 
 
 class TuluMethodsTests(unittest.TestCase):

@@ -1,5 +1,7 @@
 # Tulu learning-signal and precision diagnostics
 
+> Historical reconstructed-protocol record. Superseded for primary replication by [the original-source rollback](original-protocol-rollback.md). Existing results remain diagnostic evidence.
+
 ## Evidence from the first seven pilots
 
 All 128-step pilots completed and adapters were saved/reloaded, but reported

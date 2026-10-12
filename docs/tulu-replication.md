@@ -1,5 +1,7 @@
 # Tulu replication: baseline validation and reconstructed pilot
 
+> Historical reconstructed-protocol record. Superseded for primary replication by [the original-source rollback](original-protocol-rollback.md). Existing results remain diagnostic evidence.
+
 ## Recovered versus missing recipe
 
 The paper Appendix A specifies `allenai/Llama-3.1-Tulu-3-8B-RM`, batch 8,

@@ -1,0 +1,45 @@
+{
+  "model_name": "allenai/Llama-3.1-Tulu-3-8B-RM",
+  "model_revision": "84e607acab8adab64fa8cdaa26a9391d28362802",
+  "dataset_name": "HannahRoseKirk/prism-alignment",
+  "dataset_revision": "18ab5cfb37456f4ec8cbc00212ce54cf7b1239f6",
+  "learning_rate": 1e-06,
+  "max_steps": 1024,
+  "tau": 0.5,
+  "beta": 1.0,
+  "shuffle_seed": 0,
+  "batch_size": 8,
+  "method": "filtered_weighted",
+  "lora": {
+    "r": 8,
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ],
+    "lora_alpha": 64,
+    "lora_dropout": 0.1,
+    "modules_to_save": [
+      "score"
+    ]
+  },
+  "countries": {
+    "Chile": {},
+    "South Africa": {
+      "method": "weighted_only",
+      "beta": 4.0
+    },
+    "New Zealand": {},
+    "Australia": {
+      "max_steps": 128
+    },
+    "Mexico": {},
+    "Israel": {},
+    "Canada": {}
+  },
+  "status": "pending_original_protocol_rerun",
+  "historical_unknowns": [
+    "Original Tulu LoRA rank and target modules were not recovered",
+    "Original Tulu paper preprocessing is unavailable; this uses the supplied original script inputs for code-faithful comparison"
+  ],
+  "protocol": "original-source-v1"
+}

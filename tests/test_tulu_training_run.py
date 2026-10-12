@@ -10,7 +10,7 @@ class TuluTrainingRunTests(unittest.TestCase):
     def test_fp32_training_audit_and_fresh_reload_metrics(self):
         import torch
         from transformers import BertTokenizer, LlamaConfig, LlamaForSequenceClassification
-        from scripts.tulu_replication import train, score
+        from scripts.tulu_reconstructed import train, score
         torch.set_num_threads(2)
         torch.manual_seed(0)
         with tempfile.TemporaryDirectory() as folder:
@@ -45,7 +45,7 @@ class TuluTrainingRunTests(unittest.TestCase):
                 'countries': {'Chile': {'rewards': reference}}}}}))
             output = root / 'output'
             output.mkdir()
-            with patch('scripts.tulu_replication.load_model', side_effect=lambda *a: LlamaForSequenceClassification.from_pretrained(base)):
+            with patch('scripts.tulu_reconstructed.load_model', side_effect=lambda *a: LlamaForSequenceClassification.from_pretrained(base)):
                 train(cfg, output, baseline, 'Chile', 'legacy-pair')
             result = json.loads((output / 'report.json').read_text())
             audit = result['training_update_audit']

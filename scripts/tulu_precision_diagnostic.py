@@ -8,7 +8,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from scripts.tulu_replication import load_model, metrics, score, write_json
+from scripts.tulu_reconstructed import load_model, metrics, score, write_json
 
 
 def summarize(values):

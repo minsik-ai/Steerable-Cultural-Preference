@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "model": "OpenAssistant/reward-model-deberta-v3-base",
+  "model_revision": "7dab4156e63944834c3aae169c3fe83955672cff",
+  "dataset": "HannahRoseKirk/prism-alignment",
+  "dataset_revision": "18ab5cfb37456f4ec8cbc00212ce54cf7b1239f6",
+  "python": "3.11.16",
+  "experiment_source_revision": "94f8430054835aa919b226b4344b8f0e8424f29b",
+  "batch_size": 8,
+  "max_steps": 2,
+  "split_seed": 0,
+  "model_seed": 0,
+  "trainer_seed": 42,
+  "trainer_data_seed": null,
+  "interpretation": "Per-country exploratory fixed-test selections; Israel accepted by user below prior matching threshold",
+  "countries": {
+    "Chile": {
+      "shuffle_seed": 0,
+      "learning_rate": 1e-06,
+      "tau": 0.5,
+      "beta": 1.1,
+      "status": "matched",
+      "observed": {
+        "overall": 60.60606060606061,
+        "global_overall": 54.54545454545454,
+        "misranked": 37.61904761904762,
+        "global_misranked": 0
+      },
+      "checkpoint": "artifacts/country-search-01/chile/tau-05-beta-11/run/trunc/Chile/ours_3epoch",
+      "run": "artifacts/country-search-01/chile/tau-05-beta-11/run",
+      "paper_mean": 59.89,
+      "acceptance_threshold": 59.23,
+      "selection_source_revision": "33a68c94aec5e906331049dde2961c80c853845d"
+    }
+  },
+  "selection_source_revisions": [
+    "33a68c94aec5e906331049dde2961c80c853845d",
+    "9b6e916cc57e69db590fb420c1bfe8b2897881a1",
+    "e8f40f811c95744d5a5f317d8802eb44021a896e"
+  ]
+}

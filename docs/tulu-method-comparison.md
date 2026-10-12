@@ -1,5 +1,7 @@
 # Tulu comparison against full-data fine-tuning
 
+> Historical reconstructed-protocol record. Superseded for primary replication by [the original-source rollback](original-protocol-rollback.md). Existing results remain diagnostic evidence.
+
 The user explicitly requires improvement over full-data fine-tuning, not just
 improvement over the global RM. This experiment measures that comparison; it
 does not assume or guarantee a positive result.

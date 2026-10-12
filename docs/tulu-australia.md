@@ -1,5 +1,7 @@
 # Australia ablations alongside the existing South Africa search
 
+> Historical reconstructed-protocol record. Superseded for primary replication by [the original-source rollback](original-protocol-rollback.md). Existing results remain diagnostic evidence.
+
 User requested a few Australia ablations as well. South Africa job 57313 already
 runs its six-setting plan from its own frozen snapshot and is not resubmitted.
 This new job covers only Australia; both searches keep LR fixed at 1e-6 and use

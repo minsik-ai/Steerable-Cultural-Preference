@@ -2,7 +2,7 @@
 import tempfile
 import unittest
 from pathlib import Path
-from scripts.tulu_replication import build_data, encode_rows, metrics
+from scripts.tulu_reconstructed import build_data, encode_rows, metrics
 
 
 class FakeTokenizer:
