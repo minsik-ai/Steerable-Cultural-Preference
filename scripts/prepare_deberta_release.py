@@ -23,7 +23,7 @@ def digest(path):
 def card(country, settings, metrics, defaults):
     slug = country.lower().replace(' ', '-')
     return f'''---
-license: cc-by-nc-4.0
+license: mit
 library_name: transformers
 pipeline_tag: text-classification
 base_model: {defaults['model']}
@@ -54,7 +54,6 @@ same prompt. Scores are not probabilities and are not calibrated across models.
 |---|---:|
 | Starting global model, overall | {metrics['global_overall']:.4f}% |
 | Selected checkpoint, overall | {metrics['overall']:.4f}% |
-| Selected checkpoint, reference-misranked subset | {metrics['misranked']:.4f}% |
 
 These are original in-memory post-training experiment scores, with no model-mode
 or random-state reset before scoring. A fresh `eval()` inference session disables
@@ -64,8 +63,6 @@ finite, repeatable inference on generic probes; it is not a benchmark result.
 The country configuration was selected through exploratory trials on a fixed
 test split. It is not an unbiased held-out estimate or the paper's three-run mean.
 The independent execution rerun reproduced the selected recorded accuracy.
-The reference-misranked subset consists of pairs strictly misranked by this base
-model, excluding tied reference scores. Different backbones have different subsets.
 
 ## Training and reproduction
 
@@ -121,7 +118,7 @@ validated for consequential decisions about people.
 
 ## Attribution and release license
 
-These fine-tuned weights are released under [CC-BY-NC-4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+These fine-tuned weights are released under the [MIT License](https://opensource.org/license/mit).
 The [OpenAssistant base model](https://huggingface.co/{defaults['model']}) is
 marked MIT. The [PRISM dataset card](https://huggingface.co/datasets/{defaults['dataset']})
 lists human text as CC-BY-4.0 and model responses as CC-BY-NC-4.0, subject to

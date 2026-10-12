@@ -2,43 +2,50 @@
   "MulticulturalAlignment/scpo-deberta-v3-base-australia": {
     "created": true,
     "public": true,
-    "commit": "26d35c89c181eedb426ba0d3f62d415942a5ce5c",
-    "upload_verified": true
+    "commit": "ae01e03ad68e62f5550f15b56211adaeb57d6c39",
+    "upload_verified": true,
+    "initial_commit": "26d35c89c181eedb426ba0d3f62d415942a5ce5c"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-canada": {
     "created": true,
     "public": true,
-    "commit": "dd9391b04fbb2e4f92e0802d9016367341480464",
-    "upload_verified": true
+    "commit": "b994c0f9a67da61e9313a2c82ba7e9809dc61aeb",
+    "upload_verified": true,
+    "initial_commit": "dd9391b04fbb2e4f92e0802d9016367341480464"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-chile": {
     "created": true,
     "public": true,
-    "commit": "67c22e1fa19ab05c9bbf1128d19699fdd8826184",
-    "upload_verified": true
+    "commit": "74b1cc0d90f6552427b0e8784844a5dea168d0d5",
+    "upload_verified": true,
+    "initial_commit": "67c22e1fa19ab05c9bbf1128d19699fdd8826184"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-israel": {
     "created": true,
     "public": true,
-    "commit": "996cc2560ed41bfd6d184857b0465c6b41e338ec",
-    "upload_verified": true
+    "commit": "ff983852270670ea5988f5f73d4cb6bb10b6c2bf",
+    "upload_verified": true,
+    "initial_commit": "996cc2560ed41bfd6d184857b0465c6b41e338ec"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-mexico": {
     "created": true,
     "public": true,
-    "commit": "a8c7178845d8ac68a0415d8e221e0630bfc55372",
-    "upload_verified": true
+    "commit": "f5953806e851784d7081cec5515803b05a7d0e81",
+    "upload_verified": true,
+    "initial_commit": "a8c7178845d8ac68a0415d8e221e0630bfc55372"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-new-zealand": {
     "created": true,
     "public": true,
-    "commit": "0b98b9efc23893b7ff136526b360ba08455505bc",
-    "upload_verified": true
+    "commit": "966b24ee7c62eab069355eeb56b97a99160cfc98",
+    "upload_verified": true,
+    "initial_commit": "0b98b9efc23893b7ff136526b360ba08455505bc"
   },
   "MulticulturalAlignment/scpo-deberta-v3-base-south-africa": {
     "created": true,
     "public": true,
-    "commit": "98af89485e19d5acfa6d773c7e0bcc4da12646c2",
-    "upload_verified": true
+    "commit": "302bdb657ca55f049d7974223e61ad12df39efa7",
+    "upload_verified": true,
+    "initial_commit": "98af89485e19d5acfa6d773c7e0bcc4da12646c2"
   }
 }

@@ -47,7 +47,7 @@ def main():
             continue
         card = args.release_files / 'model-cards' / (country.lower().replace(' ', '-') + '.md')
         text = card.read_text()
-        if 'YOUR_NAMESPACE' in text or 'license: cc-by-nc-4.0' not in text or repo_id not in text:
+        if 'YOUR_NAMESPACE' in text or 'license: mit' not in text or repo_id not in text:
             raise ValueError(f'Unfinalized model card: {country}')
         shutil.copyfile(card, package / 'README.md')
         shutil.copyfile(args.release_files / 'LICENSE', package / 'LICENSE')
