@@ -172,12 +172,17 @@ attempt are preserved. These are exploratory configuration matches.
 
 ### Tulu replication
 
-**Current default:** [original-source protocol](docs/original-protocol-rollback.md).
-Both backbones now use the unchanged original experiment behavior. Previous Tulu
-reconstruction results and the workflows below are historical diagnostics, not
-comparable primary replication scores. Use `scripts/tulu_replication.py --config
-configs/tulu_original_protocol.json --country Chile --output <new-directory>`.
-
+**Current Tülu default:** [chat inputs with shared evaluation](docs/tulu-chat-evaluation.md).
+DeBERTa retains the original experiment. The user-authorized Tülu chat profile
+uses model-specific chat formatting with DeBERTa's original evaluation loops,
+test pairs, metrics, per-interaction batches, and in-memory scoring mode/RNG.
+Training uses chat inputs, dynamic padding and a 2048-token cap at LR 1e-6.
+Run `python scripts/tulu_replication.py --config configs/tulu_chat_protocol.json
+--country Chile --output <new-directory>` (on one line).
+See [the evaluation contract](docs/tulu-chat-evaluation.md). Previous deterministic
+Tülu scores are historical diagnostics, not results under this contract.
+The strict raw-input experiment remains available with
+`configs/tulu_original_protocol.json`.
 
 The separate [Tulu pilot](docs/tulu-replication.md) compares baseline input
 formats, validates LoRA training/export, and runs bounded country pilots using

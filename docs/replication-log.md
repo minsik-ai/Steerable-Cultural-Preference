@@ -312,3 +312,16 @@ Llama test confirms actual model modes, grad state, 512-token training batches,
 per-interaction scoring and adapter export. Archived reconstruction tests still
 pass under their explicitly renamed module. New summarizer rejects mixed/old
 protocol results and incomplete grids. Full-size paired results remain pending.
+
+
+## 2026-10-12: authorized Tülu chat inputs with shared evaluation
+
+User explicitly chose to retain Tülu chat formatting and match the rest of
+DeBERTa evaluation. Added opt-in `tulu-chat-v1` source adaptation; original
+DeBERTa and raw-Tülu profiles stay unchanged. Training restores chat/dynamic
+padding/2048 cap, retaining FP32 and LR 1e-6. Scoring retains original loops,
+untruncated interaction batches, in-memory mode and RNG, metrics and split.
+New selected-country and full-data-control configs use separate artifact roots.
+Sixteen tests passed on PW (including real tiny Llama/PEFT training/export),
+plus local lint and shell syntax checks. Full-sized GPU execution remains to
+be verified through a smoke-gated Slurm array. See tulu-chat-evaluation.md.

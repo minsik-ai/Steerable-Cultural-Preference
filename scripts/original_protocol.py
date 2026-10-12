@@ -50,7 +50,12 @@ def normalized_config(family, config):
                        'trainer_data_seed': None}.items():
         if config.get(key, value) != value:
             raise ValueError(f'Original {key} must remain {value!r}')
+    profile = config.get('execution_profile', 'original-source-v1')
+    if profile not in ('original-source-v1', 'tulu-chat-v1') or (family != 'tulu' and profile != 'original-source-v1'):
+        raise ValueError('Chat profile is supported only for Tulu')
     result = dict(BASE, batch_size=8, max_steps=1024, method='filtered_weighted')
+    if profile != 'original-source-v1':
+        result['execution_profile'] = profile
     for key in (*HYPERPARAMETERS, 'method'):
         if key in config:
             result[key] = config[key]
@@ -132,6 +137,9 @@ def derive_source(original, family, country, config):
             anchor = f'            ref_rewards_{side} = utt_train_rewards[examples["{side}_id"]]\n'
             source = replace_once(source, anchor, anchor
                                   + f'            ref_rewards_{side} = torch.zeros_like(ref_rewards_{side})\n')
+    if config.get('execution_profile') == 'tulu-chat-v1':
+        from scripts.tulu_chat_protocol import adapt_chat_inputs
+        source = adapt_chat_inputs(source)
     compile(source, '<original-protocol>', 'exec')
     return source
 
@@ -173,7 +181,10 @@ def run_country(repo, output, family, country, config, prepare_only=False):
                             'explicit PEFT SEQ_CLS adapter on fresh training model'])
     if settings['method'] != 'filtered_weighted':
         adaptations.append(f'authorized method ablation: {settings["method"]}')
-    manifest = dict(protocol='original-source-v1', family=family, country=country, config=settings, status='prepared',
+    if settings.get('execution_profile') == 'tulu-chat-v1':
+        adaptations.extend(['authorized Tulu chat formatting for reference and test scoring; no truncation',
+                            'chat training inputs; dynamic padding and 2048-token training cap'])
+    manifest = dict(protocol=settings.get('execution_profile', 'original-source-v1'), family=family, country=country, config=settings, status='prepared',
                     primary_evaluation='original in-memory post-training scoring; no mode or RNG reset',
                     process_semantics='one fresh process per country; not original seven-country sequential RNG history',
                     source_revision='94f8430054835aa919b226b4344b8f0e8424f29b',

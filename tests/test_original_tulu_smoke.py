@@ -27,6 +27,8 @@ class OriginalTuluSmokeTests(unittest.TestCase):
                                                                special_tokens=[('[BOS]',6)])
             tokenizer=PreTrainedTokenizerFast(tokenizer_object=raw,pad_token='[PAD]',unk_token='[UNK]',
                                              model_input_names=['input_ids','attention_mask'])
+            if getattr(self, 'chat_profile', False):
+                tokenizer.chat_template = "{% for message in messages %}{{ message['content'] }} {% endfor %}"
             tokenizer.save_pretrained(base)
             model=LlamaForSequenceClassification(LlamaConfig(vocab_size=7,hidden_size=16,
                 intermediate_size=32,num_hidden_layers=1,num_attention_heads=2,
@@ -45,6 +47,8 @@ class OriginalTuluSmokeTests(unittest.TestCase):
             config=dict(max_steps=1,learning_rate=1e-6,tau=.7,beta=1.1,shuffle_seed=0,
                         lora=dict(r=2,lora_alpha=4,lora_dropout=.1,target_modules=['q_proj','v_proj'],
                                   modules_to_save=['score']))
+            if getattr(self, 'chat_profile', False):
+                config['execution_profile'] = 'tulu-chat-v1'
             path=root/'original_tulu.py'
             path.write_text(derive_source((repo/'preferences.py').read_text(),'tulu','Chile',config))
             output=root/'run'
@@ -65,7 +69,7 @@ class OriginalTuluSmokeTests(unittest.TestCase):
                  patch.object(AutoModelForSequenceClassification,'from_pretrained',side_effect=load):
                 main(str(output))
             self.assertTrue(all(grad for _,grad,_,_ in records))
-            training=[r for r in records if r[2][1]==512]
+            training=[r for r in records if r[2][0] == 8] if getattr(self, 'chat_profile', False) else [r for r in records if r[2][1]==512]
             self.assertEqual(len(training),2)
             self.assertTrue(all(mode for mode,_,_,_ in training))
             self.assertTrue(all(not r[0] for r in records[:20]))
