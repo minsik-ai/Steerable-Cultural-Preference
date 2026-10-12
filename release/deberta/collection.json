@@ -1,6 +1,6 @@
 {
-  "url": "https://huggingface.co/collections/MulticulturalAlignment/scpo-deberta-country-reward-models-6acd6ef257ba2b9f33b8db95",
-  "slug": "MulticulturalAlignment/scpo-deberta-country-reward-models-6acd6ef257ba2b9f33b8db95",
+  "url": "https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95",
+  "slug": "MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95",
   "models": [
     "MulticulturalAlignment/scpo-deberta-v3-base-mexico",
     "MulticulturalAlignment/scpo-deberta-v3-base-chile",
@@ -10,5 +10,7 @@
     "MulticulturalAlignment/scpo-deberta-v3-base-south-africa",
     "MulticulturalAlignment/scpo-deberta-v3-base-australia"
   ],
-  "ordering": "Overall accuracy improvement over starting global DeBERTa, descending"
+  "ordering": "Overall accuracy improvement over the starting global model, descending",
+  "title": "SCPO country reward models",
+  "description": "Country-specific SCPO reward models, ordered by improvement over the starting model. MIT license. Paper: arxiv.org/abs/2606.18606."
 }

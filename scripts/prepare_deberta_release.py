@@ -8,6 +8,8 @@ import subprocess
 import sys
 
 
+CITATION = '@misc{scpo,\n      title={Steerable Cultural Preference Optimization of Reward Models}, \n      author={Minsik Oh and Advit Deepak and Sophie Wu and Douwe Kiela and Ekaterina Shutova},\n      year={2026},\n      eprint={2606.18606},\n      archivePrefix={arXiv},\n      primaryClass={cs.CL},\n      url={https://arxiv.org/abs/2606.18606}, \n}'
+
 def write_json(path, value):
     path.write_text(json.dumps(value, indent=2, allow_nan=False) + '\n')
 
@@ -53,16 +55,15 @@ same prompt. Scores are not probabilities and are not calibrated across models.
 | Measurement | Accuracy |
 |---|---:|
 | Starting global model, overall | {metrics['global_overall']:.4f}% |
-| Selected checkpoint, overall | {metrics['overall']:.4f}% |
+| SCPO model, overall | {metrics['overall']:.4f}% |
 
 These are original in-memory post-training experiment scores, with no model-mode
 or random-state reset before scoring. A fresh `eval()` inference session disables
 dropout and may produce different accuracy. `validation.json` checks loading and
 finite, repeatable inference on generic probes; it is not a benchmark result.
 
-The country configuration was selected through exploratory trials on a fixed
-test split. It is not an unbiased held-out estimate or the paper's three-run mean.
-The independent execution rerun reproduced the selected recorded accuracy.
+Configurations were tuned on a fixed test split; these checkpoint results differ
+from the paper’s three-run averages. Reproduction details are in `provenance.json`.
 
 ## Training and reproduction
 
@@ -123,6 +124,12 @@ The [OpenAssistant base model](https://huggingface.co/{defaults['model']}) is
 marked MIT. The [PRISM dataset card](https://huggingface.co/datasets/{defaults['dataset']})
 lists human text as CC-BY-4.0 and model responses as CC-BY-NC-4.0, subject to
 original provider terms. This package contains no PRISM records.
+
+## Citation
+
+```bibtex
+{chr(10).join(line.rstrip() for line in CITATION.splitlines())}
+```
 '''
 
 

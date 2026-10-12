@@ -29,16 +29,15 @@ same prompt. Scores are not probabilities and are not calibrated across models.
 | Measurement | Accuracy |
 |---|---:|
 | Starting global model, overall | 60.4046% |
-| Selected checkpoint, overall | 66.1850% |
+| SCPO model, overall | 66.1850% |
 
 These are original in-memory post-training experiment scores, with no model-mode
 or random-state reset before scoring. A fresh `eval()` inference session disables
 dropout and may produce different accuracy. `validation.json` checks loading and
 finite, repeatable inference on generic probes; it is not a benchmark result.
 
-The country configuration was selected through exploratory trials on a fixed
-test split. It is not an unbiased held-out estimate or the paper's three-run mean.
-The independent execution rerun reproduced the selected recorded accuracy.
+Configurations were tuned on a fixed test split; these checkpoint results differ
+from the paper’s three-run averages. Reproduction details are in `provenance.json`.
 
 ## Training and reproduction
 
@@ -99,3 +98,17 @@ The [OpenAssistant base model](https://huggingface.co/OpenAssistant/reward-model
 marked MIT. The [PRISM dataset card](https://huggingface.co/datasets/HannahRoseKirk/prism-alignment)
 lists human text as CC-BY-4.0 and model responses as CC-BY-NC-4.0, subject to
 original provider terms. This package contains no PRISM records.
+
+## Citation
+
+```bibtex
+@misc{scpo,
+      title={Steerable Cultural Preference Optimization of Reward Models},
+      author={Minsik Oh and Advit Deepak and Sophie Wu and Douwe Kiela and Ekaterina Shutova},
+      year={2026},
+      eprint={2606.18606},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2606.18606},
+}
+```

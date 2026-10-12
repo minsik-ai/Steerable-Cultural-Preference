@@ -4,7 +4,7 @@ Paper: [Steerable Cultural Preference Optimization of Reward Models](https://arx
 
 Accepted to **Pluralistic Alignment @ ICML 2026**.
 
-**Released models:** [Seven SCPO DeBERTa country reward models](https://huggingface.co/collections/MulticulturalAlignment/scpo-deberta-country-reward-models-6acd6ef257ba2b9f33b8db95)
+**Released models:** [Seven SCPO DeBERTa country reward models](https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95)
 (MIT). Each includes weights, tokenizer, exact country training code,
 settings and documented original-protocol results. Tülu remains experimental.
 

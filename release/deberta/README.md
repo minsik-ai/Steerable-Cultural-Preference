@@ -1,6 +1,6 @@
 # DeBERTa release
 
-[Public release collection](https://huggingface.co/collections/MulticulturalAlignment/scpo-deberta-country-reward-models-6acd6ef257ba2b9f33b8db95).
+[Public release collection](https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95).
 
 Organization: [MulticulturalAlignment](https://huggingface.co/MulticulturalAlignment).
 License: MIT (updated at the user’s request for permissive distribution).
