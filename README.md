@@ -176,7 +176,8 @@ attempt are preserved. These are exploratory configuration matches.
 DeBERTa retains the original experiment. The user-authorized Tülu chat profile
 uses model-specific chat formatting with DeBERTa's original evaluation loops,
 test pairs, metrics, per-interaction batches, and in-memory scoring mode/RNG.
-Training uses chat inputs, dynamic padding and a 2048-token cap at LR 1e-6.
+Training uses chat inputs, dynamic padding and a 2048-token cap. The authorized
+learning-rate comparison includes 1e-6 and 1e-5; `_lr1e5` configs select the latter.
 Run `python scripts/tulu_replication.py --config configs/tulu_chat_protocol.json
 --country Chile --output <new-directory>` (on one line).
 See [the evaluation contract](docs/tulu-chat-evaluation.md). Previous deterministic

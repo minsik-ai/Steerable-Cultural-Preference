@@ -16,6 +16,12 @@ set -euo pipefail
 SOURCE="${1:?source snapshot}"
 PY="${2:?python executable}"
 OUT="${3:?artifact root}"
+RATE="${4:-1e-6}"
+case "$RATE" in
+  1e-6) SUFFIX="" ;;
+  1e-5) SUFFIX="_lr1e5" ;;
+  *) echo "Unsupported learning rate: $RATE" >&2; exit 2 ;;
+esac
 export HF_HOME="${HF_HOME:-/home/minsik/hf}"
 export OMP_NUM_THREADS=8 TOKENIZERS_PARALLELISM=true PYTHONUNBUFFERED=1
 nvidia-smi --query-gpu=name,memory.total --format=csv
@@ -23,10 +29,10 @@ nvidia-smi --query-gpu=name,memory.total --format=csv
 COUNTRIES=(Chile 'South Africa' 'New Zealand' Australia Mexico Israel Canada)
 COUNTRY="${COUNTRIES[$((SLURM_ARRAY_TASK_ID % 7))]}"
 FAMILY=tulu
-CONFIG="$SOURCE/configs/tulu_chat_protocol.json"
+CONFIG="$SOURCE/configs/tulu_chat_protocol${SUFFIX}.json"
 GROUP=selected
 if (( SLURM_ARRAY_TASK_ID >= 7 )); then
-  CONFIG="$SOURCE/configs/tulu_chat_full_data.json"
+  CONFIG="$SOURCE/configs/tulu_chat_full_data${SUFFIX}.json"
   GROUP=full-data
 fi
 "$PY" "$SOURCE/scripts/check_original_runtime.py" --lock "$SOURCE/requirements-pw-lock.txt" \

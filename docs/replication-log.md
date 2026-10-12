@@ -325,3 +325,11 @@ New selected-country and full-data-control configs use separate artifact roots.
 Sixteen tests passed on PW (including real tiny Llama/PEFT training/export),
 plus local lint and shell syntax checks. Full-sized GPU execution remains to
 be verified through a smoke-gated Slurm array. See tulu-chat-evaluation.md.
+
+
+### Follow-up: remove smoke gate and include LR 1e-5
+
+User removed the requirement for an extra smoke run and explicitly reauthorized
+Tülu LR 1e-5 alongside 1e-6. Added matching selected-country and full-data-control
+configs differing only in learning rate, plus a validated launcher rate argument.
+Evaluation and DeBERTa remain unchanged. Use distinct outputs for each rate.
