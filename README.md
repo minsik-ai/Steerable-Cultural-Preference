@@ -10,13 +10,13 @@ Accepted to **Pluralistic Alignment @ ICML 2026**.
 > Download all seven models from the [Hugging Face collection](https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95).
 > Released under **MIT**, with weights, tokenizers, country settings, exact training code, and paper citations.
 >
-> [Mexico](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-mexico) ·
-> [Chile](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-chile) ·
-> [New Zealand](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-new-zealand) ·
-> [Canada](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-canada) ·
-> [Israel](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-israel) ·
-> [South Africa](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-south-africa) ·
-> [Australia](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-australia)
+> [Mexico](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-mexico) ·
+> [Chile](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-chile) ·
+> [New Zealand](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-new-zealand) ·
+> [Canada](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-canada) ·
+> [Israel](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-israel) ·
+> [South Africa](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-south-africa) ·
+> [Australia](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-australia)
 
 See the [latest replication results](docs/latest-replication.md) and [release record](release/deberta/README.md).
 

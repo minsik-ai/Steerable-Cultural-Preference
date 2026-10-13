@@ -41,7 +41,7 @@ tags:
 - {slug}
 - arxiv:2606.18606
 ---
-# SCPO DeBERTa-v3-base — {country}
+# SCPO Reward Model — {country}
 
 A scalar reward model fine-tuned on PRISM preference pairs from participants
 residing in {country}. Higher scores indicate a preferred response for the
@@ -98,7 +98,7 @@ The following uses standard evaluation-mode inference.
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-model_id = "MulticulturalAlignment/scpo-deberta-v3-base-{slug}"
+model_id = "MulticulturalAlignment/scpo-reward-model-{slug}"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForSequenceClassification.from_pretrained(model_id).eval()
 inputs = tokenizer("How can I disagree respectfully?",
@@ -160,7 +160,7 @@ def main():
             if digest(args.repo / name) != expected:
                 raise ValueError(f'Original source changed: {name}')
         checkpoint = Path(manifest['checkpoint'])
-        package = args.output / f'scpo-deberta-v3-base-{slug}'
+        package = args.output / f'scpo-reward-model-{slug}'
         package.mkdir()
         for name in ('config.json', 'model.safetensors'):
             shutil.copyfile(checkpoint / name, package / name)

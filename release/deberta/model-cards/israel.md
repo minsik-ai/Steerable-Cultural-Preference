@@ -15,7 +15,7 @@ tags:
 - israel
 - arxiv:2606.18606
 ---
-# SCPO DeBERTa-v3-base — Israel
+# SCPO Reward Model — Israel
 
 A scalar reward model fine-tuned on PRISM preference pairs from participants
 residing in Israel. Higher scores indicate a preferred response for the
@@ -72,7 +72,7 @@ The following uses standard evaluation-mode inference.
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-model_id = "MulticulturalAlignment/scpo-deberta-v3-base-israel"
+model_id = "MulticulturalAlignment/scpo-reward-model-israel"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForSequenceClassification.from_pretrained(model_id).eval()
 inputs = tokenizer("How can I disagree respectfully?",

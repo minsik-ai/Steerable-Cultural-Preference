@@ -2,13 +2,13 @@
   "url": "https://huggingface.co/collections/MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95",
   "slug": "MulticulturalAlignment/scpo-country-reward-models-6acd6ef257ba2b9f33b8db95",
   "models": [
-    "MulticulturalAlignment/scpo-deberta-v3-base-mexico",
-    "MulticulturalAlignment/scpo-deberta-v3-base-chile",
-    "MulticulturalAlignment/scpo-deberta-v3-base-new-zealand",
-    "MulticulturalAlignment/scpo-deberta-v3-base-canada",
-    "MulticulturalAlignment/scpo-deberta-v3-base-israel",
-    "MulticulturalAlignment/scpo-deberta-v3-base-south-africa",
-    "MulticulturalAlignment/scpo-deberta-v3-base-australia"
+    "MulticulturalAlignment/scpo-reward-model-mexico",
+    "MulticulturalAlignment/scpo-reward-model-chile",
+    "MulticulturalAlignment/scpo-reward-model-new-zealand",
+    "MulticulturalAlignment/scpo-reward-model-canada",
+    "MulticulturalAlignment/scpo-reward-model-israel",
+    "MulticulturalAlignment/scpo-reward-model-south-africa",
+    "MulticulturalAlignment/scpo-reward-model-australia"
   ],
   "ordering": "Overall accuracy improvement over the starting global model, descending",
   "title": "SCPO country reward models",

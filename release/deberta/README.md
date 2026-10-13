@@ -16,13 +16,13 @@ on fixed test data; this is not an independent three-seed reproduction.
 
 | Country | Model | Original overall accuracy | Gain over starting model |
 |---|---|---:|---:|
-| Mexico | [scpo-deberta-v3-base-mexico](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-mexico) | 64.7541% | +13.11 pp |
-| Chile | [scpo-deberta-v3-base-chile](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-chile) | 60.6061% | +6.06 pp |
-| New Zealand | [scpo-deberta-v3-base-new-zealand](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-new-zealand) | 62.3955% | +5.85 pp |
-| Canada | [scpo-deberta-v3-base-canada](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-canada) | 66.1850% | +5.78 pp |
-| Israel | [scpo-deberta-v3-base-israel](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-israel) | 66.9014% | +3.87 pp |
-| South Africa | [scpo-deberta-v3-base-south-africa](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-south-africa) | 65.4804% | +1.42 pp |
-| Australia | [scpo-deberta-v3-base-australia](https://huggingface.co/MulticulturalAlignment/scpo-deberta-v3-base-australia) | 59.8540% | +0.24 pp |
+| Mexico | [scpo-reward-model-mexico](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-mexico) | 64.7541% | +13.11 pp |
+| Chile | [scpo-reward-model-chile](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-chile) | 60.6061% | +6.06 pp |
+| New Zealand | [scpo-reward-model-new-zealand](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-new-zealand) | 62.3955% | +5.85 pp |
+| Canada | [scpo-reward-model-canada](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-canada) | 66.1850% | +5.78 pp |
+| Israel | [scpo-reward-model-israel](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-israel) | 66.9014% | +3.87 pp |
+| South Africa | [scpo-reward-model-south-africa](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-south-africa) | 65.4804% | +1.42 pp |
+| Australia | [scpo-reward-model-australia](https://huggingface.co/MulticulturalAlignment/scpo-reward-model-australia) | 59.8540% | +0.24 pp |
 
 ## Release procedure
 

@@ -15,7 +15,7 @@ tags:
 - chile
 - arxiv:2606.18606
 ---
-# SCPO DeBERTa-v3-base — Chile
+# SCPO Reward Model — Chile
 
 A scalar reward model fine-tuned on PRISM preference pairs from participants
 residing in Chile. Higher scores indicate a preferred response for the
@@ -72,7 +72,7 @@ The following uses standard evaluation-mode inference.
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-model_id = "MulticulturalAlignment/scpo-deberta-v3-base-chile"
+model_id = "MulticulturalAlignment/scpo-reward-model-chile"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForSequenceClassification.from_pretrained(model_id).eval()
 inputs = tokenizer("How can I disagree respectfully?",

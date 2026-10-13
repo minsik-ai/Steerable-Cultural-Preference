@@ -27,7 +27,7 @@ def main():
     # Check all destinations and all package hashes before uploading anything.
     for country, item in summary.items():
         package = args.packages / item['package']
-        repo_id = 'MulticulturalAlignment/' + package.name
+        repo_id = 'MulticulturalAlignment/' + package.name.replace('scpo-deberta-v3-base-', 'scpo-reward-model-')
         if digest(package / 'model.safetensors') != item['weight_sha256']:
             raise ValueError(f'Weights changed after validation: {country}')
         validation = json.loads((package / 'validation.json').read_text())
@@ -42,7 +42,7 @@ def main():
                 raise ValueError(f'Refusing to overwrite an existing untracked model: {repo_id}')
     for country, item in summary.items():
         package = args.packages / item['package']
-        repo_id = 'MulticulturalAlignment/' + package.name
+        repo_id = 'MulticulturalAlignment/' + package.name.replace('scpo-deberta-v3-base-', 'scpo-reward-model-')
         if journal.get(repo_id, {}).get('public'):
             continue
         card = args.release_files / 'model-cards' / (country.lower().replace(' ', '-') + '.md')

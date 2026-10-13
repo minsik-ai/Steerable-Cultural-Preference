@@ -15,7 +15,7 @@ tags:
 - canada
 - arxiv:2606.18606
 ---
-# SCPO DeBERTa-v3-base — Canada
+# SCPO Reward Model — Canada
 
 A scalar reward model fine-tuned on PRISM preference pairs from participants
 residing in Canada. Higher scores indicate a preferred response for the
@@ -72,7 +72,7 @@ The following uses standard evaluation-mode inference.
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-model_id = "MulticulturalAlignment/scpo-deberta-v3-base-canada"
+model_id = "MulticulturalAlignment/scpo-reward-model-canada"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForSequenceClassification.from_pretrained(model_id).eval()
 inputs = tokenizer("How can I disagree respectfully?",
